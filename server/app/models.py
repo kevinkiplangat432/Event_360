@@ -1,6 +1,6 @@
 from extensions import db
 
-# MANY-TO-MANY (association table with extra field)
+#many to many
 class Order(db.Model):
     __tablename__ = "orders"
 
@@ -11,7 +11,7 @@ class Order(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     event_id = db.Column(db.Integer, db.ForeignKey("events.id"))
 
-# ONE-TO-MANY
+# One to many
 class User(db.Model):
     __tablename__ = "users"
 
@@ -38,7 +38,7 @@ class Event(db.Model):
 
     orders = db.relationship("Order", backref="event")
 
-# ONE-TO-MANY
+# one to many
 class TicketType(db.Model):
     __tablename__ = "ticket_types"
 
