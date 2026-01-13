@@ -3,6 +3,9 @@ from flask_cors import CORS
 from config import Config
 from extensions import db, migrate
 from models import User, Event, Order, TicketType
+from extensions import db
+
+
 
 def create_app():
     app = Flask(__name__)
@@ -20,3 +23,6 @@ def create_app():
     return app
 
 app = create_app()
+
+if __name__ == "__main__":
+    app.run(port=5555, debug=True)
