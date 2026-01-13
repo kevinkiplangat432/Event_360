@@ -7,7 +7,7 @@ function App() {
   return (
     <div>
       <Navbar />
-      <P>Testing React</P>
+      <p>Testing React</p>
     </div>
   );
 }
