@@ -1,13 +1,10 @@
-import React from "react";
-import Navbar from "./components/layout/Navbar";
-
+import AppRoutes from "./routes/AppRoutes";
 
 
 function App() {
   return (
-    <div>
-      <Navbar />
-      <p>Testing React</p>
+    <div className="App">
+      <AppRoutes /> {/* No BrowserRouter here! */}
     </div>
   );
 }

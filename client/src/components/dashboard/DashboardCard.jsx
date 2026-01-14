@@ -1,14 +1,8 @@
-/* overview for tickets purchased, reviews and etc */
-
-import React from "react"
-
-function DashboardCard({ title, value }) {
+export default function DashboardCard({ title, value }) {
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 text-center hover:shadow-xl transition">
-      <h3 className="text-gray-500">{title}</h3>
-      <p className="text-2xl font-bold mt-2">{value}</p>
+    <div className="bg-white p-4 rounded shadow hover:shadow-lg transition">
+      <h3 className="font-semibold">{title}</h3>
+      <p className="text-2xl font-bold">{value}</p>
     </div>
   );
 }
-
-export default DashboardCard;
