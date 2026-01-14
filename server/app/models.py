@@ -1,19 +1,10 @@
 from datetime import datetime
 from extensions import db
 
-class Role(db.Model):
-    __tablename__ = "roles"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(datetime.timezone.utc))
-
-    users = db.relationship("User", back_populates="role")
-
 
 class User(db.Model):
     __tablename__ = "users"
-
+    
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -27,12 +18,21 @@ class User(db.Model):
     events = db.relationship("Event", back_populates="organizer")
     orders = db.relationship("Order", back_populates="user")
     registrations = db.relationship("EventRegistration", back_populates="user")
-    approvals = db.relationship("EventApproval", back_populates="admin")
+    event_approvals = db.relationship("EventApproval", back_populates="admin")  
 
+
+class Role(db.Model):
+    __tablename__ = "roles"
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    users = db.relationship("User", back_populates="role")
 
 class Event(db.Model):
     __tablename__ = "events"
-
+    
     id = db.Column(db.Integer, primary_key=True)
     organizer_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     title = db.Column(db.String(200), nullable=False)
@@ -45,7 +45,7 @@ class Event(db.Model):
 
     organizer = db.relationship("User", back_populates="events")
     orders = db.relationship("Order", back_populates="event")
-    approvals = db.relationship("EventApproval", back_populates="event")
+    event_approvals = db.relationship("EventApproval", back_populates="event")
     registrations = db.relationship("EventRegistration", back_populates="event")
     ticket_types = db.relationship("TicketType", back_populates="event")
 
@@ -60,8 +60,8 @@ class EventApproval(db.Model):
     comment = db.Column(db.Text)
     decided_at = db.Column(db.DateTime, default=lambda: datetime.now(datetime.timezone.utc))
 
-    event = db.relationship("Event", back_populates="approvals")
-    admin = db.relationship("User", back_populates="approvals")
+    event = db.relationship("Event", back_populates="event_approvals")
+    admin = db.relationship("User", back_populates="event_approvals")
 
 
 class Order(db.Model):
@@ -76,7 +76,7 @@ class Order(db.Model):
 
     user = db.relationship("User", back_populates="orders")
     event = db.relationship("Event", back_populates="orders")
-    payments = db.relationship("Payment", back_populates="order")
+    payment = db.relationship("Payment", back_populates="order", uselist=False)
     tickets = db.relationship("Ticket", back_populates="order")
 
 
@@ -91,7 +91,7 @@ class Payment(db.Model):
     raw_payload = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(datetime.timezone.utc))
 
-    order = db.relationship("Order", back_populates="payments")
+    order = db.relationship("Order", back_populates="payment")
 
 
 class EventRegistration(db.Model):
@@ -105,18 +105,10 @@ class EventRegistration(db.Model):
 
     user = db.relationship("User", back_populates="registrations")
     event = db.relationship("Event", back_populates="registrations")
-
-
-class TicketType(db.Model):
-    __tablename__ = "ticket_types"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    price = db.Column(db.Numeric, nullable=False)
-    quantity_total = db.Column(db.Integer)
-    event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=False)
-
-    event = db.relationship("Event", back_populates="ticket_types")
+    
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'event_id', name='unique_user_event_registration'),
+    )
 
 
 class Ticket(db.Model):
@@ -125,7 +117,20 @@ class Ticket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey("orders.id"), nullable=False)
     code = db.Column(db.String(100), unique=True, nullable=False)
-    status = db.Column(db.String(50))
+    status = db.Column(db.String(50), default="valid")
     checked_in_at = db.Column(db.DateTime)
 
     order = db.relationship("Order", back_populates="tickets")
+
+
+class TicketType(db.Model):
+    __tablename__ = "ticket_types"
+
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=False)
+    name = db.Column(db.String(50))
+    price = db.Column(db.Numeric, nullable=False)
+    quantity_total = db.Column(db.Integer)
+
+    event = db.relationship("Event", back_populates="ticket_types")
+
