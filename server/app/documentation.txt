@@ -1,0 +1,46 @@
+how does the models meet requiremnts.
+the requirements:
+    Have at least five models on the backend, that include the following:
+    At least two one-to-many relationships.
+    At least one reciprocal many-to-many relationship.
+    The many-to-many association model/table must have a user submittable attribute, i.e. an attribute aside from the foreign keys.
+    Full CRUD actions for at least one resource.
+Minimum of create and read actions for EACH resource.
+Identity Access Management. Have at least one administrator role and at least two client roles e.g (merchant and customers)
+Authorization. Have access to approving requests made by e.g merchants. 
+Authentication. Have access to the application. 
+Use forms and validation through Formik on all input.
+At least one data type validation.
+At least one string/number format validation.
+Have at least three different client-side routes using React Router. Be sure to include a nav bar or other UI element that allows users to navigate between routes.
+Connect the client and server using fetch().
+
+
+meets: 
+have : 9 models 
+    1. users
+    2. roles
+    3. events
+    4. event_approvals
+    5. orders
+    6.payments
+    7. tickets
+    8. tickect type
+    8. event_registration
+
+
+    those with one to many rel are:
+    Role → Users
+    User (merchant) → Events
+    Event → Orders
+    Order → Tickets
+    Order → Payments
+
+    that with many to many rel are :
+    users and events
+
+    extra submitted attr quantity
+    thorugh event event_registration
+    
+
+
