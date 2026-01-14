@@ -58,7 +58,13 @@ const Events = () => {
       price: 1200,
       originalPrice: 600,
       isLastMinute: true,
-      ticketType: "Last Minute Sale"
+      ticketType: "Last Minute Sale",
+      hasMultipleTiers: true,
+      ticketTiers: [
+        { type: "Regular", price: 1200, originalPrice: 600 },
+        { type: "VIP", price: 5000, originalPrice: null },
+        { type: "VVIP", price: 10000, originalPrice: null }
+      ]
     },
     {
       id: 5,
