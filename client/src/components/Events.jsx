@@ -1,6 +1,5 @@
-// Events.jsx
 import React from 'react';
-import EventCard from './components/EventCard';
+import EventCard from './EventCard';
 
 function Events() {
   const events = [
@@ -70,7 +69,12 @@ function Events() {
       urgencyText: null,
       categoryColor: "from-red-600 to-blue-800",
       buttonColor: "from-red-600 to-blue-800",
-      imageUrl: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      imageUrl: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      ticketTypes: [
+        { name: "Regular", price: "$1200", originalPrice: "$600" },
+        { name: "VIP", price: "$1000", originalPrice: null },
+        { name: "VVIP", price: "$5000", originalPrice: null }
+      ]
     },
     {
       id: 5,
@@ -134,20 +138,20 @@ function Events() {
     },
     {
       id: 8,
-      title: "Moringa School Alumni Dinner",
+      title: "Alumni Dinner",
       category: "Alumni Networking",
-      date: "February 14, 2026",
-      time: "20:00",
-      location: "Fairmont The Norfolk Hotel, Nairobi",
-      description: "Join us for an elegant evening of networking and celebration at the prestigious Fairmont The Norfolk Hotel. Reconnect with fellow alumni and celebrate our shared journey.",
+      date: "February 12, 2026",
+      time: "20:00 - Midnight",
+      location: "Fairmont Norfolk Hotel, Nairobi",
+      description: "Join us for an elegant evening of networking and celebration at the prestigious Fairmont Norfolk Hotel. Reconnect with fellow alumni, share memories, and celebrate our journey together. Hosted by Moringa School.",
       tickets: 300,
       price: 100,
       originalPrice: null,
-      discountText: "Early Bird Pricing!",
+      discountText: null,
       urgencyText: null,
-      categoryColor: "from-rose-600 to-pink-600",
-      buttonColor: "from-rose-600 to-pink-600",
-      imageUrl: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      categoryColor: "from-amber-600 to-orange-700",
+      buttonColor: "from-amber-600 to-orange-700",
+      imageUrl: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       organizer: "Moringa School",
       ticketTypes: [
         { name: "Single", price: "$100", originalPrice: null },
