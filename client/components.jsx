@@ -131,6 +131,28 @@ function Events() {
       buttonColor: "from-indigo-900 to-slate-700",
       imageUrl: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       organizer: "NASA"
+    },
+    {
+      id: 8,
+      title: "Moringa School Alumni Dinner",
+      category: "Alumni Networking",
+      date: "February 14, 2026",
+      time: "20:00",
+      location: "Fairmont The Norfolk Hotel, Nairobi",
+      description: "Join us for an elegant evening of networking and celebration at the prestigious Fairmont The Norfolk Hotel. Reconnect with fellow alumni and celebrate our shared journey.",
+      tickets: 300,
+      price: 100,
+      originalPrice: null,
+      discountText: "Early Bird Pricing!",
+      urgencyText: null,
+      categoryColor: "from-rose-600 to-pink-600",
+      buttonColor: "from-rose-600 to-pink-600",
+      imageUrl: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      organizer: "Moringa School",
+      ticketTypes: [
+        { name: "Single", price: "$100", originalPrice: null },
+        { name: "Couple", price: "$150", originalPrice: null }
+      ]
     }
   ];
 
