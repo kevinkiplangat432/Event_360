@@ -36,6 +36,19 @@ CREATE TABLE "event_approvals" (
   "decided_at" timestamp
 );
 
+CREATE TABLE "ticket_types" (
+  "id" int PRIMARY KEY,
+  "event_id" int NOT NULL,
+  "name" varchar NOT NULL,
+  "price" numeric NOT NULL,
+  "quantity_total" int NOT NULL,
+  "quantity_sold" int DEFAULT 0,
+  "sale_start" timestamp,
+  "sale_end" timestamp,
+  "access_level" varchar DEFAULT 'general',
+  "is_active" boolean DEFAULT true
+);
+
 CREATE TABLE "orders" (
   "id" int PRIMARY KEY,
   "user_id" int NOT NULL,
@@ -55,20 +68,22 @@ CREATE TABLE "payments" (
   "created_at" timestamp
 );
 
+CREATE TABLE "tickets" (
+  "id" int PRIMARY KEY,
+  "order_id" int NOT NULL,
+  "ticket_type_id" int NOT NULL,
+  "code" varchar UNIQUE NOT NULL,
+  "qr_image_url" varchar,
+  "status" varchar DEFAULT 'valid',
+  "checked_in_at" timestamp
+);
+
 CREATE TABLE "event_registrations" (
   "id" int PRIMARY KEY,
   "user_id" int NOT NULL,
   "event_id" int NOT NULL,
   "quantity" int NOT NULL,
   "registered_at" timestamp
-);
-
-CREATE TABLE "tickets" (
-  "id" int PRIMARY KEY,
-  "order_id" int NOT NULL,
-  "code" varchar UNIQUE NOT NULL,
-  "status" varchar,
-  "checked_in_at" timestamp
 );
 
 CREATE INDEX ON "users" ("email");
@@ -83,6 +98,8 @@ ALTER TABLE "event_approvals" ADD FOREIGN KEY ("event_id") REFERENCES "events" (
 
 ALTER TABLE "event_approvals" ADD FOREIGN KEY ("admin_id") REFERENCES "users" ("id");
 
+ALTER TABLE "ticket_types" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id");
+
 ALTER TABLE "orders" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "orders" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id");
@@ -90,6 +107,8 @@ ALTER TABLE "orders" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id");
 ALTER TABLE "payments" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
 
 ALTER TABLE "tickets" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
+
+ALTER TABLE "tickets" ADD FOREIGN KEY ("ticket_type_id") REFERENCES "ticket_types" ("id");
 
 ALTER TABLE "event_registrations" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
