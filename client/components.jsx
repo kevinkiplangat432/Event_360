@@ -53,7 +53,7 @@ function Events() {
       urgencyText: "⚠️ Almost Sold Out!",
       categoryColor: "from-green-600 to-blue-600",
       buttonColor: "from-green-600 to-blue-600",
-      imageUrl: "https://images.unsplash.com/photo-1598880940080-ff9a29891b85?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      imageUrl: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
       id: 4,
