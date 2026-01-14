@@ -112,6 +112,26 @@ const Events = () => {
       organizer: "NASA",
       isLimited: true,
       ticketType: "Limited Access"
+    },
+    {
+      id: 8,
+      name: "Moringa School Alumni Dinner",
+      category: "Alumni Networking",
+      date: "February 14, 2026",
+      time: "20:00",
+      availableTickets: 300,
+      status: "upcoming",
+      description: "Join us for an elegant evening of networking and celebration at the prestigious Fairmont The Norfolk Hotel. Reconnect with fellow alumni and celebrate our shared journey.",
+      location: "Fairmont The Norfolk Hotel, Nairobi",
+      price: 100,
+      originalPrice: null,
+      isEarlyBird: true,
+      hasMultipleTiers: true,
+      ticketTiers: [
+        { type: "Single", price: 100, originalPrice: null },
+        { type: "Couple", price: 150, originalPrice: null }
+      ],
+      organizer: "Moringa School"
     }
   ]);
 
@@ -126,7 +146,11 @@ const Events = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 p-5">
       <div className="max-w-7xl mx-auto">
         <header className="text-center text-white mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3">Upcoming Events</h1>
+          <h1 className="text-5xl md:text-7xl font-extrabold mb-4 tracking-wider drop-shadow-2xl">
+            <span className="bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-transparent bg-clip-text animate-pulse">
+              EVENT_360
+            </span>
+          </h1>
           <p className="text-lg md:text-xl opacity-90">Discover and book your next amazing experience</p>
         </header>
 
@@ -140,7 +164,8 @@ const Events = () => {
               "Sports Championship": "from-red-600 to-blue-800",
               "Tech Conference": "from-indigo-600 to-purple-700",
               "Beach Summer Festival": "from-cyan-500 to-blue-600",
-              "Science": "from-indigo-900 to-slate-700"
+              "Science": "from-indigo-900 to-slate-700",
+              "Alumni Networking": "from-rose-600 to-pink-600"
             };
 
             const gradientClass = gradientColors[event.category] || "from-purple-600 to-indigo-600";
