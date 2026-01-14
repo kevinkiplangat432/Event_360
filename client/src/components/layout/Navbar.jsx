@@ -1,26 +1,14 @@
-import React from "react";
+import { Link } from "react-router-dom";
 
-function Navbar(){
-    return(
-        <nav className = "flex items-center justify-between px-8 py-4 bg-white shadow">
-            <h1 className="text-xl font-bold">Event 360</h1>
-
-            <ul className="flex gap-6 text-gray-600">
-                <li>Home</li>
-                <li>Upcoming Events</li>
-                 <li>Pricing</li>
-        <li>How it works</li>
-      </ul>
-
-      <button className="px-4 py-2 bg-orange-500 text-white rounded-lg">
-        Contact Us
-      </button>
+export default function Navbar() {
+  return (
+    <nav className="flex justify-between items-center p-4 bg-gray-800 text-white">
+      <Link to="/" className="text-2xl font-bold">Event360</Link>
+      <div className="space-x-4">
+        <Link to="/">Home</Link>
+        <Link to="/login">Login</Link>
+        <Link to="/signup">Sign Up</Link>
+      </div>
     </nav>
   );
 }
-
-export default Navbar;
-
-
-
-         
