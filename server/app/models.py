@@ -2,6 +2,16 @@ from datetime import datetime, timezone
 from extensions import db
 
 
+class Role(db.Model):
+    __tablename__ = "roles"
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    users = db.relationship("User", back_populates="role")
+
+
 class User(db.Model):
     __tablename__ = "users"
     
@@ -12,7 +22,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(datetime.timezone.utc))
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     role = db.relationship("Role", back_populates="users")
     events = db.relationship("Event", back_populates="organizer")
@@ -20,15 +30,6 @@ class User(db.Model):
     registrations = db.relationship("EventRegistration", back_populates="user")
     event_approvals = db.relationship("EventApproval", back_populates="admin")  
 
-
-class Role(db.Model):
-    __tablename__ = "roles"
-    
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    users = db.relationship("User", back_populates="role")
 
 class Event(db.Model):
     __tablename__ = "events"
@@ -41,7 +42,7 @@ class Event(db.Model):
     start_time = db.Column(db.DateTime, nullable=False)
     end_time = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(50), nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(datetime.timezone.utc))
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     poster_url = db.Column(db.String(255))
 
     organizer = db.relationship("User", back_populates="events")
@@ -59,7 +60,7 @@ class EventApproval(db.Model):
     admin_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     status = db.Column(db.String(50), nullable=False)
     comment = db.Column(db.Text)
-    decided_at = db.Column(db.DateTime, default=lambda: datetime.now(datetime.timezone.utc))
+    decided_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     event = db.relationship("Event", back_populates="event_approvals")
     admin = db.relationship("User", back_populates="event_approvals")
@@ -91,7 +92,7 @@ class Order(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=False)
     total_amount = db.Column(db.Numeric, nullable=False)
     payment_status = db.Column(db.String(50), nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(datetime.timezone.utc))
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = db.relationship("User", back_populates="orders")
     event = db.relationship("Event", back_populates="orders")
@@ -108,7 +109,7 @@ class Payment(db.Model):
     provider_ref = db.Column(db.String(100))
     status = db.Column(db.String(50))
     raw_payload = db.Column(db.JSON)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(datetime.timezone.utc))
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     order = db.relationship("Order", back_populates="payment")
 
@@ -135,40 +136,11 @@ class EventRegistration(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    registered_at = db.Column(db.DateTime, default=lambda: datetime.now(datetime.timezone.utc))
+    registered_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = db.relationship("User", back_populates="registrations")
-<<<<<<< HEAD
     event = db.relationship("Event", back_populates="registrations")
-=======
-    event = db.relationship("Event", back_populates="registrations")
-    
+
     __table_args__ = (
         db.UniqueConstraint('user_id', 'event_id', name='unique_user_event_registration'),
     )
-
-
-class Ticket(db.Model):
-    __tablename__ = "tickets"
-
-    id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey("orders.id"), nullable=False)
-    code = db.Column(db.String(100), unique=True, nullable=False)
-    status = db.Column(db.String(50), default="valid")
-    checked_in_at = db.Column(db.DateTime)
-
-    order = db.relationship("Order", back_populates="tickets")
-
-
-class TicketType(db.Model):
-    __tablename__ = "ticket_types"
-
-    id = db.Column(db.Integer, primary_key=True)
-    event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=False)
-    name = db.Column(db.String(50))
-    price = db.Column(db.Numeric, nullable=False)
-    quantity_total = db.Column(db.Integer)
-
-    event = db.relationship("Event", back_populates="ticket_types")
-
->>>>>>> 008b7e3c77e61345d6fe35fa565814a9a1590163
