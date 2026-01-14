@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from extensions import db
 
 class Role(db.Model):
@@ -21,7 +21,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(datetime.timezone.utc))
 
     role = db.relationship("Role", back_populates="users")
     events = db.relationship("Event", back_populates="organizer")
@@ -64,6 +64,24 @@ class EventApproval(db.Model):
     admin = db.relationship("User", back_populates="approvals")
 
 
+class TicketType(db.Model):
+    __tablename__ = "ticket_types"
+
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
+    price = db.Column(db.Numeric, nullable=False)
+    quantity_total = db.Column(db.Integer, nullable=False)
+    quantity_sold = db.Column(db.Integer, default=0)
+    sale_start = db.Column(db.DateTime)
+    sale_end = db.Column(db.DateTime)
+    access_level = db.Column(db.String(50), default="general")
+    is_active = db.Column(db.Boolean, default=True)
+
+    event = db.relationship("Event", back_populates="ticket_types")
+    tickets = db.relationship("Ticket", back_populates="ticket_type")
+
+
 class Order(db.Model):
     __tablename__ = "orders"
 
@@ -94,6 +112,21 @@ class Payment(db.Model):
     order = db.relationship("Order", back_populates="payments")
 
 
+class Ticket(db.Model):
+    __tablename__ = "tickets"
+
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey("orders.id"), nullable=False)
+    ticket_type_id = db.Column(db.Integer, db.ForeignKey("ticket_types.id"), nullable=False)
+    code = db.Column(db.String(100), unique=True, nullable=False)
+    qr_image_url = db.Column(db.String(255))
+    status = db.Column(db.String(50), default="valid")
+    checked_in_at = db.Column(db.DateTime)
+
+    order = db.relationship("Order", back_populates="tickets")
+    ticket_type = db.relationship("TicketType", back_populates="tickets")
+
+
 class EventRegistration(db.Model):
     __tablename__ = "event_registrations"
 
@@ -105,27 +138,3 @@ class EventRegistration(db.Model):
 
     user = db.relationship("User", back_populates="registrations")
     event = db.relationship("Event", back_populates="registrations")
-
-
-class TicketType(db.Model):
-    __tablename__ = "ticket_types"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    price = db.Column(db.Numeric, nullable=False)
-    quantity_total = db.Column(db.Integer)
-    event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=False)
-
-    event = db.relationship("Event", back_populates="ticket_types")
-
-
-class Ticket(db.Model):
-    __tablename__ = "tickets"
-
-    id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey("orders.id"), nullable=False)
-    code = db.Column(db.String(100), unique=True, nullable=False)
-    status = db.Column(db.String(50))
-    checked_in_at = db.Column(db.DateTime)
-
-    order = db.relationship("Order", back_populates="tickets")
