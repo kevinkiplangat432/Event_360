@@ -42,6 +42,7 @@ class Event(db.Model):
     end_time = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(datetime.timezone.utc))
+    poster_url = db.Column(db.String(255))
 
     organizer = db.relationship("User", back_populates="events")
     orders = db.relationship("Order", back_populates="event")

@@ -25,6 +25,7 @@ CREATE TABLE "events" (
   "end_time" timestamp NOT NULL,
   "status" varchar NOT NULL,
   "created_at" timestamp
+  "poster_url" varchar
 );
 
 CREATE TABLE "event_approvals" (
