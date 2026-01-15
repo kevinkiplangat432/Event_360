@@ -12,6 +12,16 @@ class Role(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
     users = db.relationship("User", back_populates="role")
+    
+    @staticmethod
+    def create_default_roles():
+        """Create default roles if they don't exist"""
+        default_roles = ['user', 'organizer', 'admin']
+        for role_name in default_roles:
+            if not Role.query.filter_by(name=role_name).first():
+                role = Role(name=role_name)
+                db.session.add(role)
+        db.session.commit()
 
 class User(db.Model):
     __tablename__ = "users"

@@ -1,3 +1,4 @@
+// src/pages/CreateEvent.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -8,14 +9,17 @@ import {
   Upload, 
   X,
   AlertCircle,
-  Clock
+  Clock,
+  Image as ImageIcon
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { uploadToCloudinary } from '../utils/imageUpload';
 
 const CreateEvent = () => {
   const navigate = useNavigate();
   const { user, isOrganizer, isAdmin } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
@@ -26,29 +30,30 @@ const CreateEvent = () => {
     venue: '',
     address: '',
     city: '',
-    country: '',
+    country: 'Kenya',
     startDate: '',
     startTime: '',
     endDate: '',
     endTime: '',
     capacity: '',
+    price: '',
+    poster_url: '',
     isPublic: true
   });
+
+  const [imagePreview, setImagePreview] = useState('');
 
   // Check if user has permission to create events
   if (!isOrganizer() && !isAdmin()) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          <AlertCircle className="h-12 w-12 text-primary-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-dark-900 dark:text-white mb-2">
             Organizer Access Required
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-dark-600 dark:text-dark-400 mb-4">
             You need to be an organizer to create events.
-          </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Current role: <span className="font-medium capitalize">{user?.role}</span>
           </p>
         </div>
       </div>
@@ -76,6 +81,56 @@ const CreateEvent = () => {
     }));
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      setError('Image size should be less than 5MB');
+      return;
+    }
+
+    setUploading(true);
+    setError('');
+
+    try {
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+
+      // Upload to Cloudinary
+      const cloudinaryUrl = await uploadToCloudinary(file);
+      
+      setFormData(prev => ({
+        ...prev,
+        poster_url: cloudinaryUrl
+      }));
+      
+      setSuccess('Image uploaded successfully!');
+    } catch (err) {
+      setError('Failed to upload image. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeImage = () => {
+    setImagePreview('');
+    setFormData(prev => ({
+      ...prev,
+      poster_url: ''
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -89,11 +144,31 @@ const CreateEvent = () => {
       return;
     }
 
+    if (!formData.poster_url) {
+      setError('Please upload an event poster');
+      setLoading(false);
+      return;
+    }
+
     try {
+      // Combine date and time
+      const startDateTime = new Date(`${formData.startDate}T${formData.startTime}`);
+      const endDateTime = formData.endDate ? new Date(`${formData.endDate}T${formData.endTime}`) : null;
+
+      const eventData = {
+        ...formData,
+        start_time: startDateTime.toISOString(),
+        end_time: endDateTime ? endDateTime.toISOString() : null,
+        capacity: formData.capacity ? parseInt(formData.capacity) : null,
+        price: formData.price ? parseFloat(formData.price) : 0
+      };
+
       // Mock API call - replace with actual API
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       setSuccess('Event created successfully! It will be reviewed by admin before going live.');
+      
+      // Reset form
       setFormData({
         title: '',
         description: '',
@@ -101,14 +176,17 @@ const CreateEvent = () => {
         venue: '',
         address: '',
         city: '',
-        country: '',
+        country: 'Kenya',
         startDate: '',
         startTime: '',
         endDate: '',
         endTime: '',
         capacity: '',
+        price: '',
+        poster_url: '',
         isPublic: true
       });
+      setImagePreview('');
       
       // Redirect to events page after 2 seconds
       setTimeout(() => {
@@ -125,10 +203,10 @@ const CreateEvent = () => {
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-2xl font-bold text-dark-900 dark:text-white mb-2">
             Create New Event
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-dark-600 dark:text-dark-400">
             Fill in the details below to create your event. All events require admin approval.
           </p>
           <div className="mt-4">
@@ -157,15 +235,61 @@ const CreateEvent = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Image Upload */}
+          <div className="card">
+            <h2 className="text-lg font-semibold text-dark-900 dark:text-white mb-4">
+              <span className="flex items-center">
+                <ImageIcon className="h-5 w-5 mr-2" />
+                Event Poster
+              </span>
+            </h2>
+            
+            <div className="space-y-4">
+              {imagePreview ? (
+                <div className="relative">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-64 object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-dark-300 dark:border-dark-600 rounded-lg p-8 text-center">
+                  <Upload className="h-12 w-12 text-dark-400 mx-auto mb-4" />
+                  <p className="text-dark-600 dark:text-dark-400 mb-4">
+                    Upload event poster (Max 5MB)
+                  </p>
+                  <label className="btn-primary cursor-pointer inline-block">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={uploading}
+                    />
+                    {uploading ? 'Uploading...' : 'Choose Image'}
+                  </label>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Basic Information */}
           <div className="card">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-lg font-semibold text-dark-900 dark:text-white mb-4">
               Basic Information
             </h2>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
                   Event Title *
                 </label>
                 <input
@@ -174,43 +298,62 @@ const CreateEvent = () => {
                   value={formData.title}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Enter event title"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Description
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Description *
                 </label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
+                  required
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Describe your event..."
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Category *
-                </label>
-                <div className="relative">
-                  <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <select
-                    name="category"
-                    value={formData.category}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                    Category *
+                  </label>
+                  <div className="relative">
+                    <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-dark-400" />
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      required
+                      className="w-full pl-10 pr-4 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    >
+                      <option value="">Select a category</option>
+                      {categories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                    Ticket Price (KES)
+                  </label>
+                  <input
+                    type="number"
+                    name="price"
+                    value={formData.price}
                     onChange={handleChange}
-                    required
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
-                  >
-                    <option value="">Select a category</option>
-                    {categories.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
+                    min="0"
+                    step="0.01"
+                    className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="0.00"
+                  />
                 </div>
               </div>
             </div>
@@ -218,7 +361,7 @@ const CreateEvent = () => {
 
           {/* Location */}
           <div className="card">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-lg font-semibold text-dark-900 dark:text-white mb-4">
               <span className="flex items-center">
                 <MapPin className="h-5 w-5 mr-2" />
                 Location
@@ -227,7 +370,7 @@ const CreateEvent = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
                   Venue Name *
                 </label>
                 <input
@@ -236,27 +379,41 @@ const CreateEvent = () => {
                   value={formData.venue}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="e.g., KICC, Carnivore"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  City
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  City *
                 </label>
                 <input
                   type="text"
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                  required
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="e.g., Nairobi"
                 />
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Country
+                </label>
+                <input
+                  type="text"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
                   Full Address
                 </label>
                 <input
@@ -264,7 +421,7 @@ const CreateEvent = () => {
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Street address"
                 />
               </div>
@@ -273,7 +430,7 @@ const CreateEvent = () => {
 
           {/* Date & Time */}
           <div className="card">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-lg font-semibold text-dark-900 dark:text-white mb-4">
               <span className="flex items-center">
                 <Clock className="h-5 w-5 mr-2" />
                 Date & Time
@@ -282,7 +439,7 @@ const CreateEvent = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
                   Start Date *
                 </label>
                 <input
@@ -292,12 +449,12 @@ const CreateEvent = () => {
                   onChange={handleChange}
                   required
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
                   Start Time *
                 </label>
                 <input
@@ -306,13 +463,13 @@ const CreateEvent = () => {
                   value={formData.startTime}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  End Date
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  End Date (Optional)
                 </label>
                 <input
                   type="date"
@@ -320,20 +477,20 @@ const CreateEvent = () => {
                   value={formData.endDate}
                   onChange={handleChange}
                   min={formData.startDate}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  End Time
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  End Time (Optional)
                 </label>
                 <input
                   type="time"
                   name="endTime"
                   value={formData.endTime}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -341,7 +498,7 @@ const CreateEvent = () => {
 
           {/* Capacity & Settings */}
           <div className="card">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-lg font-semibold text-dark-900 dark:text-white mb-4">
               <span className="flex items-center">
                 <Users className="h-5 w-5 mr-2" />
                 Capacity & Settings
@@ -350,8 +507,8 @@ const CreateEvent = () => {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Maximum Capacity
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Maximum Capacity (Optional)
                 </label>
                 <input
                   type="number"
@@ -359,7 +516,7 @@ const CreateEvent = () => {
                   value={formData.capacity}
                   onChange={handleChange}
                   min="1"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Leave empty for unlimited"
                 />
               </div>
@@ -371,9 +528,9 @@ const CreateEvent = () => {
                   name="isPublic"
                   checked={formData.isPublic}
                   onChange={handleChange}
-                  className="h-4 w-4 text-accent-600 focus:ring-accent-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-dark-300 rounded"
                 />
-                <label htmlFor="isPublic" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                <label htmlFor="isPublic" className="ml-2 text-sm text-dark-700 dark:text-dark-300">
                   Make this event public
                 </label>
               </div>
@@ -392,7 +549,7 @@ const CreateEvent = () => {
             
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || uploading}
               className="btn-primary px-6"
             >
               {loading ? (

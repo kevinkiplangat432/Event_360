@@ -18,12 +18,17 @@ def register():
     data = request.get_json()
     
     # Validation
-    required_fields = ['username', 'email', 'password']
+    required_fields = ['username', 'email', 'password', 'role']
     for field in required_fields:
         if not data.get(field):
             return jsonify({'error': f'{field} is required'}), 400
     
-    # Email format validation
+    # Role validation
+    valid_roles = ['user', 'organizer', 'admin']
+    if data['role'] not in valid_roles:
+        return jsonify({'error': 'Invalid role. Must be user, organizer, or admin'}), 400
+    
+    # Email validation
     email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(email_regex, data['email']):
         return jsonify({'error': 'Invalid email format'}), 400
@@ -38,51 +43,44 @@ def register():
     if User.query.filter_by(username=data['username']).first():
         return jsonify({'error': 'Username already taken'}), 400
     
-    # Phone validation (if provided)
-    if data.get('phone'):
-        phone_regex = r'^\+?1?\d{9,15}$'
-        if not re.match(phone_regex, data['phone']):
-            return jsonify({'error': 'Invalid phone number format'}), 400
-    
-    # Get default role (attendee)
-    default_role = Role.query.filter_by(name='attendee').first()
-    if not default_role:
-        default_role = Role(name='attendee')
-        db.session.add(default_role)
-        db.session.commit()
+    # Get role
+    role = Role.query.filter_by(name=data['role']).first()
+    if not role:
+        # Create role if it doesn't exist
+        role = Role(name=data['role'])
+        db.session.add(role)
+        db.session.flush()
     
     # Create user
     user = User(
         username=data['username'],
         email=data['email'],
         phone=data.get('phone'),
-        role_id=default_role.id
+        role_id=role.id
     )
     user.set_password(data['password'])
     
     db.session.add(user)
     db.session.commit()
     
-    # Create welcome notification
-    notification = Notification(
-        user_id=user.id,
-        title='Welcome to Event360! 🎉',
-        message='Your account has been successfully created. Start exploring amazing events!',
-        type='welcome'
-    )
-    db.session.add(notification)
-    db.session.commit()
+    # Create JWT token
+    token = jwt.encode({
+        'user_id': user.id,
+        'email': user.email,
+        'role_id': user.role_id,
+        'exp': datetime.now(timezone.utc) + timedelta(days=7)
+    }, SECRET_KEY)
     
     return jsonify({
         'message': 'Registration successful',
+        'token': token,
         'user': {
             'id': user.id,
             'username': user.username,
             'email': user.email,
-            'role_id': user.role_id
+            'role': role.name
         }
     }), 201
-
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
