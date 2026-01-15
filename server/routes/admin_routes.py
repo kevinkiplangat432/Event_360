@@ -1,13 +1,12 @@
 # server/routes/admin_routes.py
 from flask import Blueprint, request, jsonify
 from server.extensions import db
-from server.models import Event, EventApproval, User, Role, Notification
+from server.models import Event, EventApproval, User, Role, Notification, Order
 from server.auth import token_required, role_required
 from datetime import datetime, timezone
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/api/admin')
 
-# ========== GET PENDING EVENTS FOR APPROVAL ==========
 @admin_bp.route('/events/pending', methods=['GET'])
 @token_required
 @role_required('admin')
@@ -26,7 +25,6 @@ def get_pending_events():
     
     return jsonify(events_data), 200
 
-# ========== APPROVE/REJECT EVENT ==========
 @admin_bp.route('/events/<int:event_id>/approve', methods=['POST'])
 @token_required
 @role_required('admin')
@@ -73,7 +71,6 @@ def approve_event(event_id):
         'event': event.to_dict()
     }), 200
 
-# ========== MANAGE USER ROLES ==========
 @admin_bp.route('/users/<int:user_id>/role', methods=['PUT'])
 @token_required
 @role_required('admin')
@@ -112,7 +109,6 @@ def update_user_role(user_id):
         'user': user.to_dict()
     }), 200
 
-# ========== ACTIVATE/DEACTIVATE USER ==========
 @admin_bp.route('/users/<int:user_id>/status', methods=['PUT'])
 @token_required
 @role_required('admin')
@@ -146,7 +142,6 @@ def toggle_user_status(user_id):
         'user': user.to_dict()
     }), 200
 
-# ========== GET ALL ORDERS (Admin view) ==========
 @admin_bp.route('/orders', methods=['GET'])
 @token_required
 @role_required('admin')
@@ -176,7 +171,6 @@ def get_all_orders():
     
     return jsonify(orders_data), 200
 
-# ========== GET SYSTEM STATISTICS ==========
 @admin_bp.route('/statistics', methods=['GET'])
 @token_required
 @role_required('admin')

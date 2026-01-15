@@ -140,7 +140,6 @@ def payment_callback(provider):
     data = request.get_json() or request.form.to_dict()
     
     # Log the callback for debugging
-    print(f"Payment callback from {provider}: {data}")
     
     # In production, verify the callback signature here
     # Then update payment status based on provider response

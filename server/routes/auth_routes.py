@@ -13,7 +13,6 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'event360-jwt-secret-2024')
 
-# ========== REGISTRATION ==========
 @auth_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -84,7 +83,6 @@ def register():
         }
     }), 201
 
-# ========== LOGIN ==========
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -127,13 +125,11 @@ def login():
         }
     }), 200
 
-# ========== LOGOUT ==========
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
     session.clear()
     return jsonify({'message': 'Logged out successfully'}), 200
 
-# ========== CURRENT USER ==========
 @auth_bp.route('/me', methods=['GET'])
 def get_current_user():
     from server.auth import token_required, get_current_user as auth_get_current_user
