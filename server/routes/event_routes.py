@@ -8,7 +8,6 @@ import re
 
 event_bp = Blueprint('events', __name__, url_prefix='/api/events')
 
-# ========== GET ALL EVENTS (Public) ==========
 @event_bp.route('', methods=['GET'])
 def get_all_events():
     # Get query parameters
@@ -38,7 +37,6 @@ def get_all_events():
     events = query.all()
     return jsonify([event.to_dict() for event in events]), 200
 
-# ========== GET EVENT BY ID (Public) ==========
 @event_bp.route('/<int:event_id>', methods=['GET'])
 def get_event(event_id):
     event = Event.query.get_or_404(event_id)
@@ -84,7 +82,6 @@ def get_event(event_id):
     
     return jsonify(event_data), 200
 
-# ========== CREATE EVENT (Organizer only) ==========
 @event_bp.route('', methods=['POST'])
 @token_required
 @role_required('organizer', 'admin')
@@ -165,7 +162,6 @@ def create_event():
         'event': event.to_dict()
     }), 201
 
-# ========== UPDATE EVENT (Organizer only) ==========
 @event_bp.route('/<int:event_id>', methods=['PUT'])
 @token_required
 def update_event(event_id):
@@ -210,7 +206,6 @@ def update_event(event_id):
         'event': event.to_dict()
     }), 200
 
-# ========== DELETE EVENT (Organizer/Admin only) ==========
 @event_bp.route('/<int:event_id>', methods=['DELETE'])
 @token_required
 def delete_event(event_id):
@@ -229,7 +224,6 @@ def delete_event(event_id):
     
     return jsonify({'message': 'Event deleted successfully'}), 200
 
-# ========== ADD TO WISHLIST ==========
 @event_bp.route('/<int:event_id>/wishlist', methods=['POST'])
 @token_required
 def add_to_wishlist(event_id):
@@ -254,7 +248,6 @@ def add_to_wishlist(event_id):
     
     return jsonify({'message': 'Added to wishlist successfully'}), 201
 
-# ========== REMOVE FROM WISHLIST ==========
 @event_bp.route('/<int:event_id>/wishlist', methods=['DELETE'])
 @token_required
 def remove_from_wishlist(event_id):
@@ -271,7 +264,6 @@ def remove_from_wishlist(event_id):
     
     return jsonify({'message': 'Removed from wishlist successfully'}), 200
 
-# ========== CREATE REVIEW ==========
 @event_bp.route('/<int:event_id>/reviews', methods=['POST'])
 @token_required
 def create_review(event_id):
@@ -322,7 +314,6 @@ def create_review(event_id):
         }
     }), 201
 
-# ========== GET EVENT REGISTRATIONS ==========
 @event_bp.route('/<int:event_id>/registrations', methods=['GET'])
 @token_required
 def get_event_registrations(event_id):

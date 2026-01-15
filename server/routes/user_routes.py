@@ -7,7 +7,6 @@ import re
 
 user_bp = Blueprint('users', __name__, url_prefix='/api/users')
 
-# ========== GET ALL USERS (Admin only) ==========
 @user_bp.route('', methods=['GET'])
 @token_required
 @role_required('admin')
@@ -15,19 +14,16 @@ def get_all_users():
     users = User.query.all()
     return jsonify([user.to_dict() for user in users]), 200
 
-# ========== GET USER BY ID ==========
 @user_bp.route('/<int:user_id>', methods=['GET'])
 @token_required
 def get_user(user_id):
     user = User.query.get_or_404(user_id)
     
-    # Users can only view their own profile unless admin
     if request.current_user.id != user_id and request.current_user.role.name != 'admin':
         return jsonify({'error': 'Unauthorized'}), 403
     
     return jsonify(user.to_dict()), 200
 
-# ========== UPDATE USER PROFILE ==========
 @user_bp.route('/<int:user_id>', methods=['PUT'])
 @token_required
 def update_user(user_id):
@@ -74,7 +70,6 @@ def update_user(user_id):
         'user': user.to_dict()
     }), 200
 
-# ========== CHANGE PASSWORD ==========
 @user_bp.route('/<int:user_id>/change-password', methods=['PUT'])
 @token_required
 def change_password(user_id):
@@ -112,7 +107,6 @@ def change_password(user_id):
     
     return jsonify({'message': 'Password changed successfully'}), 200
 
-# ========== GET USER'S EVENTS (Organizer) ==========
 @user_bp.route('/<int:user_id>/events', methods=['GET'])
 @token_required
 def get_user_events(user_id):
@@ -122,7 +116,6 @@ def get_user_events(user_id):
     events = Event.query.filter_by(organizer_id=user_id).all()
     return jsonify([event.to_dict() for event in events]), 200
 
-# ========== GET USER'S ORDERS ==========
 @user_bp.route('/<int:user_id>/orders', methods=['GET'])
 @token_required
 def get_user_orders(user_id):
@@ -150,7 +143,6 @@ def get_user_orders(user_id):
     
     return jsonify(orders_data), 200
 
-# ========== GET USER'S WISHLIST ==========
 @user_bp.route('/<int:user_id>/wishlist', methods=['GET'])
 @token_required
 def get_user_wishlist(user_id):
@@ -169,7 +161,6 @@ def get_user_wishlist(user_id):
     
     return jsonify(wishlist_data), 200
 
-# ========== GET USER'S NOTIFICATIONS ==========
 @user_bp.route('/<int:user_id>/notifications', methods=['GET'])
 @token_required
 def get_user_notifications(user_id):
@@ -191,7 +182,6 @@ def get_user_notifications(user_id):
     
     return jsonify(notifications_data), 200
 
-# ========== MARK NOTIFICATION AS READ ==========
 @user_bp.route('/<int:user_id>/notifications/<int:notification_id>/read', methods=['PUT'])
 @token_required
 def mark_notification_read(user_id, notification_id):
