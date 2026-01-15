@@ -20,9 +20,15 @@
     "globals": "^16.5.0",
     "postcss": "^8.5.6",
     "tailwind": "^3.1.0",
+    "tailwindcss": "^4.1.18",
     "vite": "npm:rolldown-vite@7.2.5"
   },
   "overrides": {
     "vite": "npm:rolldown-vite@7.2.5"
+  },
+  "dependencies": {
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.12.0"
   }
 }
