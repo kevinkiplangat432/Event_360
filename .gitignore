@@ -8,3 +8,8 @@ server/venv/
 
 # Environment variables
 .env
+
+# Node
+node_modules/
+dist/
+build/
