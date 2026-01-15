@@ -35,7 +35,7 @@ def approve_event(event_id):
     if event.status != 'pending':
         return jsonify({'error': 'Event is not pending approval'}), 400
     
-    action = data.get('action')  # 'approve' or 'reject'
+    action = data.get('action')  # approve or reject
     comment = data.get('comment', '')
     
     if action not in ['approve', 'reject']:

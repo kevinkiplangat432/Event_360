@@ -136,12 +136,6 @@ def get_order_payments(order_id):
 # POST - Simulate payment callback (for webhooks)
 @payment_bp.route('/callback/<provider>', methods=['POST'])
 def payment_callback(provider):
-    # This endpoint would receive callbacks from payment providers
     data = request.get_json() or request.form.to_dict()
-    
-    # Log the callback for debugging
-    
-    # In production, verify the callback signature here
-    # Then update payment status based on provider response
-    
+
     return jsonify({'status': 'received'}), 200

@@ -71,4 +71,3 @@ def seed_database():
         print(f"   Created attendee user: {attendee_email}")
     
     db.session.commit()
-    print("✅ Database seeded successfully!")
