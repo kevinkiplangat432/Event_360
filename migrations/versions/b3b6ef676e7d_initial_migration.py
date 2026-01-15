@@ -1,8 +1,8 @@
 """initial migration
 
-Revision ID: 06b1eb384640
+Revision ID: b3b6ef676e7d
 Revises: 
-Create Date: 2026-01-14 13:43:23.911872
+Create Date: 2026-01-15 06:35:13.232193
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '06b1eb384640'
+revision = 'b3b6ef676e7d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,6 +34,7 @@ def upgrade():
     sa.Column('role_id', sa.Integer(), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('avatar_url', sa.String(length=255), nullable=True),
     sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
@@ -45,12 +46,31 @@ def upgrade():
     sa.Column('title', sa.String(length=200), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
     sa.Column('venue', sa.String(length=200), nullable=True),
+    sa.Column('address', sa.String(length=500), nullable=True),
+    sa.Column('city', sa.String(length=100), nullable=True),
+    sa.Column('country', sa.String(length=100), nullable=True),
     sa.Column('start_time', sa.DateTime(), nullable=False),
     sa.Column('end_time', sa.DateTime(), nullable=False),
-    sa.Column('status', sa.String(length=50), nullable=False),
+    sa.Column('category', sa.String(length=100), nullable=True),
+    sa.Column('status', sa.String(length=50), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('poster_url', sa.String(length=255), nullable=True),
+    sa.Column('banner_url', sa.String(length=255), nullable=True),
+    sa.Column('capacity', sa.Integer(), nullable=True),
+    sa.Column('is_public', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['organizer_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('notifications',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('title', sa.String(length=200), nullable=False),
+    sa.Column('message', sa.Text(), nullable=True),
+    sa.Column('type', sa.String(length=50), nullable=True),
+    sa.Column('is_read', sa.Boolean(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('event_approvals',
@@ -69,7 +89,10 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('event_id', sa.Integer(), nullable=False),
     sa.Column('quantity', sa.Integer(), nullable=False),
+    sa.Column('registration_type', sa.String(length=50), nullable=True),
+    sa.Column('notes', sa.Text(), nullable=True),
     sa.Column('registered_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['event_id'], ['events.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id'),
@@ -79,25 +102,64 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('event_id', sa.Integer(), nullable=False),
-    sa.Column('total_amount', sa.Numeric(), nullable=False),
-    sa.Column('payment_status', sa.String(length=50), nullable=False),
+    sa.Column('total_amount', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('payment_status', sa.String(length=50), nullable=True),
+    sa.Column('order_status', sa.String(length=50), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('reference', sa.String(length=100), nullable=True),
+    sa.ForeignKeyConstraint(['event_id'], ['events.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('reference')
+    )
+    op.create_table('reviews',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('event_id', sa.Integer(), nullable=False),
+    sa.Column('rating', sa.Integer(), nullable=False),
+    sa.Column('comment', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['event_id'], ['events.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('user_id', 'event_id', name='unique_user_event_review')
     )
     op.create_table('ticket_types',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('event_id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=50), nullable=False),
-    sa.Column('price', sa.Numeric(), nullable=False),
+    sa.Column('name', sa.String(length=100), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('price', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.Column('quantity_total', sa.Integer(), nullable=False),
     sa.Column('quantity_sold', sa.Integer(), nullable=True),
     sa.Column('sale_start', sa.DateTime(), nullable=True),
     sa.Column('sale_end', sa.DateTime(), nullable=True),
     sa.Column('access_level', sa.String(length=50), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
+    sa.Column('max_per_user', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['event_id'], ['events.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('wishlists',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('event_id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['event_id'], ['events.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('user_id', 'event_id', name='unique_user_event_wishlist')
+    )
+    op.create_table('order_items',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('order_id', sa.Integer(), nullable=False),
+    sa.Column('ticket_type_id', sa.Integer(), nullable=False),
+    sa.Column('quantity', sa.Integer(), nullable=False),
+    sa.Column('unit_price', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('subtotal', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ),
+    sa.ForeignKeyConstraint(['ticket_type_id'], ['ticket_types.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('payments',
@@ -105,6 +167,7 @@ def upgrade():
     sa.Column('order_id', sa.Integer(), nullable=False),
     sa.Column('provider', sa.String(length=50), nullable=True),
     sa.Column('provider_ref', sa.String(length=100), nullable=True),
+    sa.Column('amount', sa.Numeric(precision=10, scale=2), nullable=True),
     sa.Column('status', sa.String(length=50), nullable=True),
     sa.Column('raw_payload', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
@@ -119,6 +182,7 @@ def upgrade():
     sa.Column('qr_image_url', sa.String(length=255), nullable=True),
     sa.Column('status', sa.String(length=50), nullable=True),
     sa.Column('checked_in_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ),
     sa.ForeignKeyConstraint(['ticket_type_id'], ['ticket_types.id'], ),
     sa.PrimaryKeyConstraint('id'),
@@ -131,10 +195,14 @@ def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('tickets')
     op.drop_table('payments')
+    op.drop_table('order_items')
+    op.drop_table('wishlists')
     op.drop_table('ticket_types')
+    op.drop_table('reviews')
     op.drop_table('orders')
     op.drop_table('event_registrations')
     op.drop_table('event_approvals')
+    op.drop_table('notifications')
     op.drop_table('events')
     op.drop_table('users')
     op.drop_table('roles')
