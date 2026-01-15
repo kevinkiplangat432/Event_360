@@ -1,12 +1,11 @@
-import AppRoutes from "./routes/AppRoutes";
-
-
-function App() {
+import React from 'react'
+import Events from './components/Events.jsx'
+const App = () => {
   return (
-    <div className="App">
-      <AppRoutes /> {/* No BrowserRouter here! */}
+    <div>
+      <Events />
     </div>
-  );
+  )
 }
 
 export default App;
