@@ -1,4 +1,3 @@
-# create_first_admin.py
 from server import create_app
 from server.extensions import db
 from server.models import User, Role

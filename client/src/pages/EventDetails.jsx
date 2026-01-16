@@ -1,4 +1,3 @@
-// src/pages/EventDetails.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -79,7 +78,6 @@ const EventDetails = () => {
       return;
     }
     setWishlisted(!wishlisted);
-    // TODO: API call to add/remove from wishlist
   };
 
   if (loading) {

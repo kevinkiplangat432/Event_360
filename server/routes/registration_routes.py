@@ -1,4 +1,3 @@
-# server/routes/registration_routes.py
 from flask import Blueprint, request, jsonify
 from server.extensions import db
 from server.models import EventRegistration, Event, User, Notification
@@ -7,7 +6,6 @@ from datetime import datetime, timezone
 
 registration_bp = Blueprint('registrations', __name__, url_prefix='/api/registrations')
 
-# GET all registrations for current user
 @registration_bp.route('', methods=['GET'])
 @token_required
 def get_user_registrations():
@@ -36,7 +34,6 @@ def get_user_registrations():
     
     return jsonify(registrations_data), 200
 
-# POST - Create new registration
 @registration_bp.route('', methods=['POST'])
 @token_required
 def create_registration():
@@ -131,7 +128,6 @@ def create_registration():
         'next_step': 'proceed_to_checkout'
     }), 201
 
-# DELETE - Cancel registration
 @registration_bp.route('/<int:id>', methods=['DELETE'])
 @token_required
 def cancel_registration(id):
@@ -170,7 +166,6 @@ def cancel_registration(id):
     
     return jsonify({'message': 'Registration cancelled successfully'}), 200
 
-# GET - Get registration by ID
 @registration_bp.route('/<int:id>', methods=['GET'])
 @token_required
 def get_registration(id):

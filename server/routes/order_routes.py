@@ -8,7 +8,6 @@ from datetime import datetime, timezone
 
 order_bp = Blueprint('orders', __name__, url_prefix='/api/orders')
 
-# GET all orders for current user
 @order_bp.route('', methods=['GET'])
 @token_required
 def get_user_orders():

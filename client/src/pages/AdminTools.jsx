@@ -1,4 +1,3 @@
-// src/pages/AdminTools.jsx - New component for admin utilities
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { 
@@ -60,14 +59,10 @@ const AdminTools = () => {
     setError('');
 
     try {
-      // This would be an API call in production
-      // For now, we'll simulate seeding
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Simulate successful seeding
       setMessage('Database seeded successfully with sample events!');
       
-      // Refresh the page to see new events
       setTimeout(() => {
         window.location.reload();
       }, 2000);
@@ -84,7 +79,6 @@ const AdminTools = () => {
     setError('');
 
     try {
-      // This would call an API endpoint to create the first admin
       const response = await fetch('/api/admin/create-first-admin', {
         method: 'POST',
         headers: {
@@ -93,7 +87,7 @@ const AdminTools = () => {
         body: JSON.stringify({
           username: 'admin',
           email: 'admin@eventhub.com',
-          password: 'Admin123!' // In production, this would be generated
+          password: 'Admin123!' 
         })
       });
 
