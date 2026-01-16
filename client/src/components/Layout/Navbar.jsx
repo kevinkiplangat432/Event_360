@@ -1,3 +1,4 @@
+// src/components/Layout/Navbar.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
@@ -12,7 +13,8 @@ import {
   Ticket,
   Shield,
   LayoutDashboard,
-  Bell
+  Bell,
+  PlusCircle
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -33,13 +35,13 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 glassmorphism">
+    <nav className="sticky top-0 z-50 glassmorphism shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <Calendar className="h-7 w-7 text-primary-600 dark:text-primary-400" />
-            <span className="text-lg font-bold text-dark-900 dark:text-white">Event360</span>
+            <span className="text-lg font-bold text-dark-900 dark:text-white">EventHub</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -49,23 +51,23 @@ const Navbar = () => {
             </Link>
             
             {isAuthenticated && isOrganizer() && (
-              <Link to="/create-event" className="text-sm text-dark-700 dark:text-dark-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              <Link to="/create-event" className="text-sm text-dark-700 dark:text-dark-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center">
+                <PlusCircle className="h-4 w-4 mr-1" />
                 Create Event
               </Link>
             )}
             
             {isAuthenticated && (isOrganizer() || isAdmin()) && (
-              <Link to="/dashboard" className="text-sm text-dark-700 dark:text-dark-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              <Link to="/dashboard" className="text-sm text-dark-700 dark:text-dark-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center">
+                <LayoutDashboard className="h-4 w-4 mr-1" />
                 Dashboard
               </Link>
             )}
             
             {isAuthenticated && isAdmin() && (
-              <Link to="/admin" className="text-sm text-dark-700 dark:text-dark-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                <span className="flex items-center">
-                  <Shield className="h-4 w-4 mr-1" />
-                  Admin
-                </span>
+              <Link to="/admin" className="text-sm text-dark-700 dark:text-dark-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center">
+                <Shield className="h-4 w-4 mr-1" />
+                Admin
               </Link>
             )}
           </div>
@@ -87,12 +89,6 @@ const Navbar = () => {
 
             {isAuthenticated ? (
               <>
-                {/* Notifications */}
-                <button className="p-2 rounded-lg bg-dark-100 dark:bg-dark-800 hover:bg-dark-200 dark:hover:bg-dark-700 transition-colors relative">
-                  <Bell className="h-4 w-4 text-dark-700 dark:text-dark-300" />
-                  <span className="absolute -top-1 -right-1 h-2 w-2 bg-primary-600 rounded-full"></span>
-                </button>
-
                 {/* Profile Menu */}
                 <div className="relative">
                   <button
@@ -131,19 +127,8 @@ const Navbar = () => {
                           Profile
                         </Link>
                         
-                        {isOrganizer() && (
-                          <Link 
-                            to="/my-events" 
-                            onClick={() => setIsProfileOpen(false)}
-                            className="flex items-center px-4 py-2 text-sm text-dark-700 dark:text-dark-300 hover:bg-dark-50 dark:hover:bg-dark-700"
-                          >
-                            <Calendar className="h-4 w-4 mr-3" />
-                            My Events
-                          </Link>
-                        )}
-                        
                         <Link 
-                          to="/tickets" 
+                          to="/my-tickets" 
                           onClick={() => setIsProfileOpen(false)}
                           className="flex items-center px-4 py-2 text-sm text-dark-700 dark:text-dark-300 hover:bg-dark-50 dark:hover:bg-dark-700"
                         >
@@ -159,6 +144,8 @@ const Navbar = () => {
                           <Settings className="h-4 w-4 mr-3" />
                           Settings
                         </Link>
+                        
+                        <div className="border-t border-dark-100 dark:border-dark-700 my-1"></div>
                         
                         <button
                           onClick={handleLogout}
@@ -242,19 +229,28 @@ const Navbar = () => {
               
               {isAuthenticated ? (
                 <>
-                  <Link 
-                    to="/profile" 
-                    onClick={() => setIsMenuOpen(false)}
-                    className="px-4 py-2 text-sm text-dark-700 dark:text-dark-300 hover:bg-dark-100 dark:hover:bg-dark-800 rounded-lg"
-                  >
-                    Profile
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-dark-100 dark:hover:bg-dark-800 rounded-lg text-left"
-                  >
-                    Logout
-                  </button>
+                  <div className="border-t border-dark-200 dark:border-dark-700 my-2 pt-2">
+                    <Link 
+                      to="/profile" 
+                      onClick={() => setIsMenuOpen(false)}
+                      className="px-4 py-2 text-sm text-dark-700 dark:text-dark-300 hover:bg-dark-100 dark:hover:bg-dark-800 rounded-lg"
+                    >
+                      Profile
+                    </Link>
+                    <Link 
+                      to="/my-tickets" 
+                      onClick={() => setIsMenuOpen(false)}
+                      className="px-4 py-2 text-sm text-dark-700 dark:text-dark-300 hover:bg-dark-100 dark:hover:bg-dark-800 rounded-lg"
+                    >
+                      My Tickets
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-dark-100 dark:hover:bg-dark-800 rounded-lg"
+                    >
+                      Logout
+                    </button>
+                  </div>
                 </>
               ) : (
                 <div className="flex space-x-3 px-4 pt-2">

@@ -3,14 +3,20 @@ from flask import Flask
 from flask_cors import CORS
 from .extensions import db, bcrypt, cors, migrate
 from .config import config
+import os
 
 def create_app(config_name='default'):
     """Application factory pattern"""
+    print(f"=== CREATING APP WITH CONFIG: {config_name} ===")
+    print(f"FLASK_ENV environment variable: {os.environ.get('FLASK_ENV')}")
+    
     app = Flask(__name__)
     
     # Load configuration
     app.config.from_object(config[config_name])
     
+     
+    print(f"Loaded SQLALCHEMY_DATABASE_URI: {app.config.get('SQLALCHEMY_DATABASE_URI')}")
     # Initialize extensions
     db.init_app(app)
     bcrypt.init_app(app)
