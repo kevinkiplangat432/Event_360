@@ -22,12 +22,16 @@ RUN pip install --upgrade pip && \
 # Copy application code
 COPY . .
 
+# Copy entrypoint script and make executable
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
+
 # Create non-root user for security
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
 
-# Expose port
+# Expose port (Render will use $PORT environment variable)
 EXPOSE 10000
 
-# Start the application
-CMD ["gunicorn", "--bind", "0.0.0.0:5555", "run:app"]
+# Use entrypoint script
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
