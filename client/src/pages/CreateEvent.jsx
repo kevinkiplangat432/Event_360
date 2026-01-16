@@ -37,7 +37,7 @@ const CreateEvent = () => {
     endTime: '',
     capacity: '',
     price: '',
-    poster_url: '', // Now optional
+    poster_url: '',
     isPublic: true
   });
 
@@ -137,9 +137,15 @@ const CreateEvent = () => {
     setError('');
     setSuccess('');
 
-    // Validation - REMOVED poster requirement
+    // Validation
     if (!formData.title || !formData.venue || !formData.startDate) {
-      setError('Please fill in all required fields (Title, Venue, and Start Date)');
+      setError('Please fill in all required fields');
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.poster_url) {
+      setError('Please upload an event poster');
       setLoading(false);
       return;
     }
@@ -154,26 +160,11 @@ const CreateEvent = () => {
         start_time: startDateTime.toISOString(),
         end_time: endDateTime ? endDateTime.toISOString() : null,
         capacity: formData.capacity ? parseInt(formData.capacity) : null,
-        price: formData.price ? parseFloat(formData.price) : 0,
-        // If no poster_url, the backend will generate a cool background
-        poster_url: formData.poster_url || null
+        price: formData.price ? parseFloat(formData.price) : 0
       };
 
-      // TODO: Replace with actual API call
-      const response = await fetch('https://event-360-xg6h.onrender.com/api/events', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(eventData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create event');
-      }
-
-      const result = await response.json();
+      // Mock API call - replace with actual API
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       setSuccess('Event created successfully! It will be reviewed by admin before going live.');
       
@@ -202,7 +193,7 @@ const CreateEvent = () => {
         navigate('/events');
       }, 2000);
     } catch (err) {
-      setError(err.message || 'Failed to create event. Please try again.');
+      setError('Failed to create event. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -216,7 +207,7 @@ const CreateEvent = () => {
             Create New Event
           </h1>
           <p className="text-dark-600 dark:text-dark-400">
-            Fill in the details below to create your event. Poster is optional - we'll create a cool background with your event title.
+            Fill in the details below to create your event. All events require admin approval.
           </p>
           <div className="mt-4">
             <span className="badge badge-primary">
@@ -244,17 +235,14 @@ const CreateEvent = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Image Upload - Now Optional */}
+          {/* Image Upload */}
           <div className="card">
             <h2 className="text-lg font-semibold text-dark-900 dark:text-white mb-4">
               <span className="flex items-center">
                 <ImageIcon className="h-5 w-5 mr-2" />
-                Event Poster (Optional)
+                Event Poster
               </span>
             </h2>
-            <p className="text-sm text-dark-500 dark:text-dark-400 mb-4">
-              Upload a custom poster or we'll generate a beautiful background with your event title.
-            </p>
             
             <div className="space-y-4">
               {imagePreview ? (
@@ -276,7 +264,7 @@ const CreateEvent = () => {
                 <div className="border-2 border-dashed border-dark-300 dark:border-dark-600 rounded-lg p-8 text-center">
                   <Upload className="h-12 w-12 text-dark-400 mx-auto mb-4" />
                   <p className="text-dark-600 dark:text-dark-400 mb-4">
-                    Upload event poster (Max 5MB) - Optional
+                    Upload event poster (Max 5MB)
                   </p>
                   <label className="btn-primary cursor-pointer inline-block">
                     <input
@@ -288,15 +276,11 @@ const CreateEvent = () => {
                     />
                     {uploading ? 'Uploading...' : 'Choose Image'}
                   </label>
-                  <p className="text-sm text-dark-500 dark:text-dark-400 mt-4">
-                    Or leave empty for auto-generated background
-                  </p>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Rest of the form remains the same */}
           {/* Basic Information */}
           <div className="card">
             <h2 className="text-lg font-semibold text-dark-900 dark:text-white mb-4">
@@ -319,35 +303,264 @@ const CreateEvent = () => {
                 />
               </div>
 
-              {/* ... rest of the form fields remain unchanged ... */}
-              {/* Description, Category, Price, Location, Date & Time, Capacity sections */}
+              <div>
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Description *
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  required
+                  rows={4}
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Describe your event..."
+                />
+              </div>
 
-              {/* Submit Button */}
-              <div className="flex justify-between items-center mt-8">
-                <button
-                  type="button"
-                  onClick={() => navigate('/events')}
-                  className="btn-secondary"
-                >
-                  Cancel
-                </button>
-                
-                <button
-                  type="submit"
-                  disabled={loading || uploading}
-                  className="btn-primary px-6"
-                >
-                  {loading ? (
-                    <span className="flex items-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Creating...
-                    </span>
-                  ) : (
-                    'Create Event'
-                  )}
-                </button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                    Category *
+                  </label>
+                  <div className="relative">
+                    <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-dark-400" />
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      required
+                      className="w-full pl-10 pr-4 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    >
+                      <option value="">Select a category</option>
+                      {categories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                    Ticket Price (KES)
+                  </label>
+                  <input
+                    type="number"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleChange}
+                    min="0"
+                    step="0.01"
+                    className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="0.00"
+                  />
+                </div>
               </div>
             </div>
+          </div>
+
+          {/* Location */}
+          <div className="card">
+            <h2 className="text-lg font-semibold text-dark-900 dark:text-white mb-4">
+              <span className="flex items-center">
+                <MapPin className="h-5 w-5 mr-2" />
+                Location
+              </span>
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Venue Name *
+                </label>
+                <input
+                  type="text"
+                  name="venue"
+                  value={formData.venue}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="e.g., KICC, Carnivore"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  City *
+                </label>
+                <input
+                  type="text"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="e.g., Nairobi"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Country
+                </label>
+                <input
+                  type="text"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Full Address
+                </label>
+                <input
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Street address"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Date & Time */}
+          <div className="card">
+            <h2 className="text-lg font-semibold text-dark-900 dark:text-white mb-4">
+              <span className="flex items-center">
+                <Clock className="h-5 w-5 mr-2" />
+                Date & Time
+              </span>
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Start Date *
+                </label>
+                <input
+                  type="date"
+                  name="startDate"
+                  value={formData.startDate}
+                  onChange={handleChange}
+                  required
+                  min={new Date().toISOString().split('T')[0]}
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Start Time *
+                </label>
+                <input
+                  type="time"
+                  name="startTime"
+                  value={formData.startTime}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  End Date (Optional)
+                </label>
+                <input
+                  type="date"
+                  name="endDate"
+                  value={formData.endDate}
+                  onChange={handleChange}
+                  min={formData.startDate}
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  End Time (Optional)
+                </label>
+                <input
+                  type="time"
+                  name="endTime"
+                  value={formData.endTime}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Capacity & Settings */}
+          <div className="card">
+            <h2 className="text-lg font-semibold text-dark-900 dark:text-white mb-4">
+              <span className="flex items-center">
+                <Users className="h-5 w-5 mr-2" />
+                Capacity & Settings
+              </span>
+            </h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Maximum Capacity (Optional)
+                </label>
+                <input
+                  type="number"
+                  name="capacity"
+                  value={formData.capacity}
+                  onChange={handleChange}
+                  min="1"
+                  className="w-full px-3 py-2 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Leave empty for unlimited"
+                />
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="isPublic"
+                  name="isPublic"
+                  checked={formData.isPublic}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-dark-300 rounded"
+                />
+                <label htmlFor="isPublic" className="ml-2 text-sm text-dark-700 dark:text-dark-300">
+                  Make this event public
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-between items-center">
+            <button
+              type="button"
+              onClick={() => navigate('/events')}
+              className="btn-secondary"
+            >
+              Cancel
+            </button>
+            
+            <button
+              type="submit"
+              disabled={loading || uploading}
+              className="btn-primary px-6"
+            >
+              {loading ? (
+                <span className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Creating...
+                </span>
+              ) : (
+                'Create Event'
+              )}
+            </button>
           </div>
         </form>
       </div>
