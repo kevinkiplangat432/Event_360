@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 // Use Render URL if available, otherwise localhost for development
-const API_URL = process.env.REACT_APP_API_URL || 'https://event360-backend.onrender.com';
+const API_URL = process.env.REACT_APP_API_URL || 'https://event-360-kca7.onrender.com';
 
 console.log('API URL:', API_URL);
 
