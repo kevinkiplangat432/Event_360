@@ -18,15 +18,18 @@ def register():
     data = request.get_json()
     
     # Validation
-    required_fields = ['username', 'email', 'password', 'role']
+    required_fields = ['username', 'email', 'password']
     for field in required_fields:
         if not data.get(field):
             return jsonify({'error': f'{field} is required'}), 400
     
-    # Role validation
-    valid_roles = ['user', 'organizer', 'admin']
-    if data['role'] not in valid_roles:
-        return jsonify({'error': 'Invalid role. Must be user, organizer, or admin'}), 400
+    # Set default role to 'user' if not provided
+    role_name = data.get('role', 'user')
+    
+    # Role validation - DON'T ALLOW 'admin' IN REGISTRATION
+    valid_roles = ['user', 'organizer']  # ✅ Only these two
+    if role_name not in valid_roles:
+        return jsonify({'error': 'Invalid role. Must be user or organizer'}), 400
     
     # Email validation
     email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
@@ -44,10 +47,10 @@ def register():
         return jsonify({'error': 'Username already taken'}), 400
     
     # Get role
-    role = Role.query.filter_by(name=data['role']).first()
+    role = Role.query.filter_by(name=role_name).first()
     if not role:
         # Create role if it doesn't exist
-        role = Role(name=data['role'])
+        role = Role(name=role_name)
         db.session.add(role)
         db.session.flush()
     
@@ -131,28 +134,33 @@ def logout():
 
 @auth_bp.route('/me', methods=['GET'])
 def get_current_user():
-    from server.auth import token_required, get_current_user as auth_get_current_user
+    """Get current user from JWT token"""
+    # Get token from Authorization header
+    auth_header = request.headers.get('Authorization')
     
-    # Use the token_required decorator functionality
-    token = None
-    if 'Authorization' in request.headers:
-        auth_header = request.headers['Authorization']
-        if auth_header.startswith('Bearer '):
-            token = auth_header.split(" ")[1]
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return jsonify({'error': 'No token provided'}), 401
     
-    if not token and 'token' in session:
-        token = session['token']
-    
-    if not token:
-        return jsonify({'error': 'Not authenticated'}), 401
+    token = auth_header.split(" ")[1]
     
     try:
+        # Decode token
         data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        user = User.query.get(data['user_id'])
+        user_id = data.get('user_id')
+        
+        if not user_id:
+            return jsonify({'error': 'Invalid token'}), 401
+        
+        # Get user from database
+        user = User.query.get(user_id)
         
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
+        if not user.is_active:
+            return jsonify({'error': 'Account is deactivated'}), 403
+        
+        # Get user role
         user_role = Role.query.get(user.role_id)
         
         return jsonify({
@@ -166,7 +174,11 @@ def get_current_user():
                 'created_at': user.created_at.isoformat()
             }
         }), 200
+        
     except jwt.ExpiredSignatureError:
         return jsonify({'error': 'Token has expired'}), 401
     except jwt.InvalidTokenError:
         return jsonify({'error': 'Invalid token'}), 401
+    except Exception as e:
+        print(f"Error in /me endpoint: {e}")
+        return jsonify({'error': 'Server error'}), 500

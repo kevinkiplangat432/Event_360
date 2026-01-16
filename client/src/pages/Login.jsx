@@ -8,7 +8,6 @@ const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    role: 'user' // Default role
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -35,7 +34,7 @@ const Login = () => {
         const from = location.state?.from?.pathname || '/';
         navigate(from);
       } else {
-        setError(result.error);
+        setError(result.error || 'Login failed. Please try again.');
       }
     } catch (err) {
       setError('Login failed. Please try again.');
@@ -45,7 +44,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-dark-50 dark:bg-dark-900">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-dark-900 dark:text-white mb-2">
@@ -84,7 +83,7 @@ const Login = () => {
             </div>
           </div>
 
-          <div className="mb-4">
+          <div className="mb-6">
             <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
               Password
             </label>
@@ -100,25 +99,6 @@ const Login = () => {
                 placeholder="••••••••"
               />
             </div>
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
-              Login As
-            </label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-dark-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            >
-              <option value="user">User</option>
-              <option value="organizer">Organizer</option>
-              <option value="admin">Administrator</option>
-            </select>
-            <p className="text-xs text-dark-500 dark:text-dark-400 mt-2">
-              Select your role (affects permissions)
-            </p>
           </div>
 
           <button

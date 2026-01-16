@@ -6,7 +6,112 @@ from server.auth import token_required, role_required
 from datetime import datetime, timezone
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/api/admin')
+@admin_bp.route('/create-first-admin', methods=['POST'])
+def create_first_admin():
+    """Create the first admin account if no admin exists"""
+    try:
+        # Check if any admin exists
+        admin_role = Role.query.filter_by(name='admin').first()
+        if not admin_role:
+            admin_role = Role(name='admin')
+            db.session.add(admin_role)
+            db.session.flush()
+        
+        existing_admins = User.query.filter_by(role_id=admin_role.id).count()
+        
+        if existing_admins > 0:
+            return jsonify({'error': 'Admin account already exists'}), 400
+        
+        data = request.get_json()
+        
+        # Create admin user
+        admin = User(
+            username=data.get('username', 'admin'),
+            email=data.get('email', 'admin@eventhub.com'),
+            role_id=admin_role.id,
+            is_active=True
+        )
+        admin.set_password(data.get('password', 'Admin123!'))
+        
+        db.session.add(admin)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'First admin account created successfully',
+            'user': {
+                'id': admin.id,
+                'username': admin.username,
+                'email': admin.email,
+                'role': 'admin'
+            }
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
+@admin_bp.route('/seed-database', methods=['POST'])
+@token_required
+@role_required('admin')
+def seed_database():
+    """Seed database with sample data"""
+    try:
+        # Create categories if they don't exist
+        categories = ['Technology', 'Music', 'Art', 'Sports', 'Food', 'Business', 'Education', 'Workshop', 'Conference', 'Networking']
+        
+        # Create sample events
+        sample_events = [
+            {
+                'title': 'Tech Conference Nairobi 2024',
+                'description': 'Annual technology conference featuring industry leaders, workshops, and networking opportunities.',
+                'venue': 'KICC',
+                'address': 'Harambee Avenue',
+                'city': 'Nairobi',
+                'country': 'Kenya',
+                'start_time': datetime.now(timezone.utc) + timedelta(days=30),
+                'end_time': datetime.now(timezone.utc) + timedelta(days=30, hours=9),
+                'category': 'Technology',
+                'capacity': 500,
+                'poster_url': 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&auto=format&fit=crop',
+                'organizer_id': request.current_user.id,
+                'status': 'approved'
+            },
+            {
+                'title': 'Mombasa Music Festival',
+                'description': 'Three days of live music, food, and entertainment on the beautiful Mombasa coast.',
+                'venue': 'Bamburi Beach',
+                'address': 'Mombasa-Malindi Road',
+                'city': 'Mombasa',
+                'country': 'Kenya',
+                'start_time': datetime.now(timezone.utc) + timedelta(days=15),
+                'end_time': datetime.now(timezone.utc) + timedelta(days=17),
+                'category': 'Music',
+                'capacity': 2000,
+                'poster_url': 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1200&auto=format&fit=crop',
+                'organizer_id': request.current_user.id,
+                'status': 'approved'
+            }
+        ]
+        
+        created_events = []
+        
+        for event_data in sample_events:
+            event = Event(**event_data)
+            db.session.add(event)
+            db.session.flush()
+            created_events.append(event.to_dict())
+        
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Database seeded successfully',
+            'events_created': len(created_events),
+            'events': created_events
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 @admin_bp.route('/events/pending', methods=['GET'])
 @token_required
 @role_required('admin')
