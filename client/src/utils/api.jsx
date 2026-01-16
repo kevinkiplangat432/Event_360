@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Use Render URL for Vercel deployment, localhost for development
 const API_URL = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('event-360')
-  ? 'https://event-360-kca7.onrender.com'
+  ? 'https://event-360-xg6h.onrender.com'
   : 'http://localhost:5555';
 
 console.log('🌐 API URL:', API_URL);
