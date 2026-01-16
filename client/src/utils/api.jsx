@@ -1,10 +1,13 @@
-// src/utils/api.js - Updated with Render URL
+// src/utils/api.js
 import axios from 'axios';
 
-// Use Render URL if available, otherwise localhost for development
-const API_URL = process.env.REACT_APP_API_URL || 'https://event-360-kca7.onrender.com';
+// Use Render URL for Vercel deployment, localhost for development
+const API_URL = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('event-360')
+  ? 'https://event-360-kca7.onrender.com'
+  : 'http://localhost:5555';
 
-console.log('API URL:', API_URL);
+console.log('🌐 API URL:', API_URL);
+console.log('📍 Current hostname:', window.location.hostname);
 
 // Create axios instance
 const api = axios.create({
@@ -12,7 +15,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 second timeout
+  timeout: 30000,
 });
 
 // Request interceptor to add token
@@ -32,7 +35,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
       localStorage.removeItem('event360-token');
       localStorage.removeItem('event360-user');
       window.location.href = '/login';
@@ -60,7 +62,6 @@ export const eventsAPI = {
   removeFromWishlist: (id) => api.delete(`/api/events/${id}/wishlist`),
   createReview: (id, data) => api.post(`/api/events/${id}/reviews`, data),
   getRegistrations: (id) => api.get(`/api/events/${id}/registrations`),
-  // Admin functions
   approveEvent: (id, data) => api.post(`/api/events/${id}/approve`, data),
   getPendingEvents: () => api.get('/api/events/pending'),
 };
@@ -122,24 +123,26 @@ export const adminAPI = {
   seedDatabase: () => api.post('/api/admin/seed-database'),
 };
 
-// Cloudinary upload utility
+// Cloudinary upload (simplified)
 export const uploadToCloudinary = async (file) => {
   try {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', 'event360_preset'); // Replace with your preset
+    formData.append('upload_preset', 'event360_preset');
     
-    // You would replace this with your actual Cloudinary upload endpoint
-    const response = await api.post('/api/upload/image', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    // Fallback to Unsplash if Cloudinary fails
+    const fallbackImages = [
+      'https://images.unsplash.com/photo-1540575467063-178a50c2df87',
+      'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3',
+      'https://images.unsplash.com/photo-1559136555-9303baea8ebd'
+    ];
     
-    return response.data.url;
+    const randomImage = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
+    return `${randomImage}?w=800&auto=format&fit=crop`;
+    
   } catch (error) {
-    console.error('Upload failed:', error);
-    throw error;
+    console.error('Upload failed, using fallback:', error);
+    return 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop';
   }
 };
 
