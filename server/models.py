@@ -1,4 +1,4 @@
-# models.py (Updated)
+
 from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 from .extensions import db
@@ -76,7 +76,7 @@ class Event(db.Model):
     start_time = db.Column(db.DateTime, nullable=False)
     end_time = db.Column(db.DateTime, nullable=False)
     category = db.Column(db.String(100))
-    status = db.Column(db.String(50), default='pending')  # pending, approved, rejected, cancelled
+    status = db.Column(db.String(50), default='pending')  
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, onupdate=lambda: datetime.now(timezone.utc))
     poster_url = db.Column(db.String(255))

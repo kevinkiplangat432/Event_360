@@ -6,6 +6,84 @@ from server.auth import token_required, role_required
 from datetime import datetime, timezone
 import re
 
+import random
+import base64
+
+def generate_event_background(title, category):
+    """Generate a cool gradient background based on event title and category"""
+    
+    # Define color palettes for different categories
+    category_colors = {
+        'Music': [('#667eea', '#764ba2'), ('#f093fb', '#f5576c')],
+        'Conference': [('#4facfe', '#00f2fe'), ('#667eea', '#764ba2')],
+        'Workshop': [('#43e97b', '#38f9d7'), ('#fa709a', '#fee140')],
+        'Sports': [('#fa709a', '#fee140'), ('#f093fb', '#f5576c')],
+        'Networking': [('#667eea', '#764ba2'), ('#4facfe', '#00f2fe')],
+        'Art': [('#f093fb', '#f5576c'), ('#fa709a', '#fee140')],
+        'Food': [('#fa709a', '#fee140'), ('#43e97b', '#38f9d7')],
+        'Technology': [('#4facfe', '#00f2fe'), ('#667eea', '#764ba2')],
+        'Business': [('#667eea', '#764ba2'), ('#4facfe', '#00f2fe')],
+        'Education': [('#43e97b', '#38f9d7'), ('#4facfe', '#00f2fe')]
+    }
+    
+    # Get colors for category or use default
+    if category in category_colors:
+        colors = category_colors[category]
+    else:
+        colors = [('#667eea', '#764ba2'), ('#4facfe', '#00f2fe'), 
+                  ('#43e97b', '#38f9d7'), ('#fa709a', '#fee140')]
+    
+    # Pick a color based on title hash
+    title_hash = hash(title) if title else random.randint(0, 1000)
+    color_index = title_hash % len(colors)
+    gradient_colors = colors[color_index]
+    
+    # Create an SVG gradient background
+    svg = f'''
+    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+        <defs>
+            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="{gradient_colors[0]}" />
+                <stop offset="100%" stop-color="{gradient_colors[1]}" />
+            </linearGradient>
+        </defs>
+        
+        <rect width="100%" height="100%" fill="url(#grad)"/>
+        
+        <!-- Decorative circles -->
+        <circle cx="100" cy="100" r="60" fill="white" opacity="0.1"/>
+        <circle cx="700" cy="500" r="80" fill="white" opacity="0.1"/>
+        <circle cx="600" cy="100" r="40" fill="white" opacity="0.1"/>
+        
+        <!-- Event title -->
+        <text x="400" y="300" 
+              font-family="Arial, sans-serif" 
+              font-size="48" 
+              font-weight="bold"
+              fill="white" 
+              text-anchor="middle" 
+              dominant-baseline="middle">
+            {title}
+        </text>
+        
+        <!-- Category badge -->
+        <rect x="350" y="350" width="100" height="30" rx="15" fill="white" opacity="0.2"/>
+        <text x="400" y="365" 
+              font-family="Arial, sans-serif" 
+              font-size="14" 
+              fill="white" 
+              text-anchor="middle" 
+              dominant-baseline="middle">
+            {category}
+        </text>
+    </svg>
+    '''
+    
+    # Convert SVG to data URL
+    svg_bytes = svg.encode('utf-8')
+    svg_encoded = base64.b64encode(svg_bytes).decode('utf-8')
+    return f"data:image/svg+xml;base64,{svg_encoded}"
+
 event_bp = Blueprint('events', __name__, url_prefix='/api/events')
 
 @event_bp.route('', methods=['GET'])
@@ -118,6 +196,11 @@ def create_event():
         if tt.get('price') is not None and float(tt['price']) < 0:
             return jsonify({'error': 'Ticket price cannot be negative'}), 400
     
+    # ✅ Generate poster URL if not provided
+    poster_url = data.get('poster_url')
+    if not poster_url:
+        poster_url = generate_event_background(data['title'], data['category'])
+    
     # Create event
     event = Event(
         organizer_id=request.current_user.id,
@@ -130,7 +213,7 @@ def create_event():
         start_time=start_time,
         end_time=end_time,
         category=data['category'],
-        poster_url=data.get('poster_url'),
+        poster_url=poster_url,  # ✅ Now always has a value
         banner_url=data.get('banner_url'),
         capacity=data.get('capacity'),
         is_public=data.get('is_public', True),
@@ -161,7 +244,7 @@ def create_event():
         'message': 'Event created successfully and sent for approval',
         'event': event.to_dict()
     }), 201
-
+    
 @event_bp.route('/<int:event_id>', methods=['PUT'])
 @token_required
 def update_event(event_id):
