@@ -63,7 +63,6 @@ const Events = () => {
       const response = await eventsAPI.getAll(params);
       setEvents(response.data);
       
-      // In a real API, you'd get total pages from response
       setTotalPages(Math.ceil(response.data.length / 12));
     } catch (error) {
       console.error('Error fetching events:', error);

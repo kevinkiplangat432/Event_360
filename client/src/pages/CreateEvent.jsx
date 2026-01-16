@@ -1,4 +1,3 @@
-// src/pages/CreateEvent.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -43,7 +42,6 @@ const CreateEvent = () => {
 
   const [imagePreview, setImagePreview] = useState('');
 
-  // Check if user has permission to create events
   if (!isOrganizer() && !isAdmin()) {
     return (
       <div className="min-h-screen flex items-center justify-center">

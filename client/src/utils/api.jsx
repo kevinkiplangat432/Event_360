@@ -1,15 +1,10 @@
-// src/utils/api.js
 import axios from 'axios';
 
-// Use Render URL for Vercel deployment, localhost for development
 const API_URL = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('event-360')
   ? 'https://event-360-xg6h.onrender.com'
   : 'http://localhost:5555';
 
-console.log('🌐 API URL:', API_URL);
-console.log('📍 Current hostname:', window.location.hostname);
 
-// Create axios instance
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -18,7 +13,6 @@ const api = axios.create({
   timeout: 30000,
 });
 
-// Request interceptor to add token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('event360-token');
@@ -30,7 +24,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -123,7 +116,7 @@ export const adminAPI = {
   seedDatabase: () => api.post('/api/admin/seed-database'),
 };
 
-// Cloudinary upload (simplified)
+// Cloudinary upload 
 export const uploadToCloudinary = async (file) => {
   try {
     const formData = new FormData();

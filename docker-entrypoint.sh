@@ -1,12 +1,8 @@
-#!/bin/bash
-# docker-entrypoint.sh
 
 echo "Starting application setup..."
 
-# Set Flask app environment variable
-export FLASK_APP=run.py  # or app.py - whatever your main file is called
+export FLASK_APP=run.py  
 
-# Run database migrations
 echo " Running database migrations..."
 flask db upgrade
 

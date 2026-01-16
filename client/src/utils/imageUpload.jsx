@@ -1,4 +1,3 @@
-// src/utils/imageUpload.js - Fix Cloudinary upload
 const uploadToCloudinary = async (file) => {
   try {
     const formData = new FormData();
@@ -18,7 +17,6 @@ const uploadToCloudinary = async (file) => {
     
   } catch (error) {
     console.error('Cloudinary upload error:', error);
-    // Fallback: Return a placeholder image
     return 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop';
   }
 };

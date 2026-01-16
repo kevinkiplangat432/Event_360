@@ -196,7 +196,6 @@ def create_event():
         if tt.get('price') is not None and float(tt['price']) < 0:
             return jsonify({'error': 'Ticket price cannot be negative'}), 400
     
-    # ✅ Generate poster URL if not provided
     poster_url = data.get('poster_url')
     if not poster_url:
         poster_url = generate_event_background(data['title'], data['category'])
@@ -213,7 +212,7 @@ def create_event():
         start_time=start_time,
         end_time=end_time,
         category=data['category'],
-        poster_url=poster_url,  # ✅ Now always has a value
+        poster_url=poster_url,  
         banner_url=data.get('banner_url'),
         capacity=data.get('capacity'),
         is_public=data.get('is_public', True),

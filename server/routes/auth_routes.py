@@ -26,8 +26,7 @@ def register():
     # Set default role to 'user' if not provided
     role_name = data.get('role', 'user')
     
-    # Role validation - DON'T ALLOW 'admin' IN REGISTRATION
-    valid_roles = ['user', 'organizer']  # ✅ Only these two
+    valid_roles = ['user', 'organizer']  
     if role_name not in valid_roles:
         return jsonify({'error': 'Invalid role. Must be user or organizer'}), 400
     

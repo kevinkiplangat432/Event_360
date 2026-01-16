@@ -33,7 +33,6 @@ def update_user(user_id):
     user = User.query.get_or_404(user_id)
     data = request.get_json()
     
-    # Update fields
     if 'username' in data:
         # Check if username is unique
         existing = User.query.filter(User.username == data['username'], User.id != user_id).first()
