@@ -30,6 +30,9 @@ RUN chmod +x /app/docker-entrypoint.sh
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
 
+ENV FLASK_APP=run.py
+ENV FLASK_ENV=production
+
 # Expose port (Render will use $PORT environment variable)
 EXPOSE 10000
 
