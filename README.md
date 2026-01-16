@@ -40,3 +40,34 @@ Flask-Migrate
 JWT Authentication
 
 SQLite / PostgreSQL (configurable)
+
+✨ Key Features
+
+User authentication & authorization
+
+Event creation and management
+
+Ticket types and registrations
+
+Secure API endpoints
+
+Responsive and modern UI
+
+Role-based access control
+
+🧑‍💻 Contributors & Roles
+Backend (Server)
+
+Kevin Kiplangat
+
+Festus Kisoi
+
+Responsible for API design, database modeling, authentication, and business logic.
+
+Frontend (Client)
+
+Sylvia Malala
+
+Wise Munene
+
+Responsible for UI/UX implementation, routing, state handling, and API integration.
