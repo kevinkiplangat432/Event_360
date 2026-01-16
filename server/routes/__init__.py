@@ -1,4 +1,3 @@
-# server/routes/__init__.py
 from .auth_routes import auth_bp
 from .user_routes import user_bp
 from .event_routes import event_bp
@@ -20,5 +19,4 @@ all_blueprints = [
     admin_bp
 ]
 
-# For easy import in main app
 __all__ = ['all_blueprints']

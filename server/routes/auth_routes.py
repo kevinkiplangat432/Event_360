@@ -83,6 +83,7 @@ def register():
     }), 201
 @auth_bp.route('/login', methods=['POST'])
 def login():
+    
     data = request.get_json()
     
     if not data.get('email') or not data.get('password'):
