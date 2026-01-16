@@ -30,4 +30,4 @@ USER appuser
 EXPOSE 10000
 
 # Start the application
-CMD ["gunicorn", "--bind", "0.0.0.0:10000", "run:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5555", "run:app"]
