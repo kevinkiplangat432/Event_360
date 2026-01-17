@@ -1,4 +1,4 @@
-# models.py (Updated)
+
 from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 from .extensions import db
@@ -16,11 +16,13 @@ class Role(db.Model):
     @staticmethod
     def create_default_roles():
         """Create default roles if they don't exist"""
-        default_roles = ['user', 'organizer', 'admin']
-        for role_name in default_roles:
-            if not Role.query.filter_by(name=role_name).first():
+        default_roles = [('attendee', 1), ('organizer', 2), ('admin', 3)]
+        for role_name, role_id in default_roles:
+            existing_role = Role.query.filter_by(name=role_name).first()
+            if not existing_role:
                 role = Role(name=role_name)
                 db.session.add(role)
+                db.session.flush()  # Get the ID
         db.session.commit()
 
 class User(db.Model):
@@ -31,7 +33,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     phone = db.Column(db.String(20))
     password_hash = db.Column(db.String(255), nullable=False)
-    role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False, default=3)  # Default to attendee
+    role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False, default=1)  # Default to attendee
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     avatar_url = db.Column(db.String(255))
@@ -76,7 +78,7 @@ class Event(db.Model):
     start_time = db.Column(db.DateTime, nullable=False)
     end_time = db.Column(db.DateTime, nullable=False)
     category = db.Column(db.String(100))
-    status = db.Column(db.String(50), default='pending')  # pending, approved, rejected, cancelled
+    status = db.Column(db.String(50), default='pending')  
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, onupdate=lambda: datetime.now(timezone.utc))
     poster_url = db.Column(db.String(255))

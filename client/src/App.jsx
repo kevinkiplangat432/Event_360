@@ -15,6 +15,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import CreateEvent from './pages/CreateEvent';
 import Admin from './pages/Admin';
+import AdminTools from './pages/AdminTools'; // NEW
+import AdminUsers from './pages/AdminUsers';
+import AdminAnalytics from './pages/AdminAnalytics';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
@@ -24,6 +27,7 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
     },
   },
 });
@@ -33,7 +37,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <Router future={{ v7_startTransition: true }}>
+          <Router>
             <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
               <Navbar />
               <main className="flex-grow">
@@ -77,6 +81,36 @@ function App() {
                     element={
                       <ProtectedRoute requiredRoles={['admin']}>
                         <Admin />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  
+                  {/* NEW: Admin Tools Route */}
+                  <Route 
+                    path="/admin-tools" 
+                    element={
+                      <ProtectedRoute requiredRoles={['admin']}>
+                        <AdminTools />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  
+                  {/* Admin Users Route */}
+                  <Route 
+                    path="/admin/users" 
+                    element={
+                      <ProtectedRoute requiredRoles={['admin']}>
+                        <AdminUsers />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  
+                  {/* Admin Analytics Route */}
+                  <Route 
+                    path="/admin/analytics" 
+                    element={
+                      <ProtectedRoute requiredRoles={['admin']}>
+                        <AdminAnalytics />
                       </ProtectedRoute>
                     } 
                   />

@@ -1,4 +1,3 @@
-# server/routes/payment_routes.py
 from flask import Blueprint, request, jsonify
 from server.extensions import db
 from server.models import Payment, Order, Notification
@@ -7,14 +6,13 @@ from datetime import datetime, timezone
 
 payment_bp = Blueprint('payments', __name__, url_prefix='/api/payments')
 
-# POST - Process payment
 @payment_bp.route('', methods=['POST'])
 @token_required
 def process_payment():
     data = request.get_json()
     
     order_id = data.get('order_id')
-    provider = data.get('provider', 'mpesa')  # mpesa, stripe, paypal
+    provider = data.get('provider', 'mpesa')  
     provider_ref = data.get('provider_ref')
     amount = data.get('amount')
     
@@ -34,7 +32,6 @@ def process_payment():
     if order.payment_status == 'completed':
         return jsonify({'error': 'Order is already paid'}), 400
     
-    # Validate amount matches order total (with small tolerance for rounding)
     if abs(float(amount) - float(order.total_amount)) > 0.01:
         return jsonify({'error': 'Payment amount does not match order total'}), 400
     
@@ -55,8 +52,6 @@ def process_payment():
     
     db.session.add(payment)
     
-    # Mock payment processing - In real app, integrate with payment gateway
-    # For demo, simulate successful payment after 2 seconds
     payment.status = 'success'
     order.payment_status = 'completed'
     order.order_status = 'confirmed'
@@ -83,13 +78,11 @@ def process_payment():
         }
     }), 200
 
-# GET - Get payment details
 @payment_bp.route('/<int:id>', methods=['GET'])
 @token_required
 def get_payment(id):
     payment = Payment.query.get_or_404(id)
     
-    # Check ownership or admin
     if payment.order.user_id != request.current_user.id and request.current_user.role.name != 'admin':
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -108,13 +101,11 @@ def get_payment(id):
         }
     }), 200
 
-# GET - Get payments for an order
 @payment_bp.route('/order/<int:order_id>', methods=['GET'])
 @token_required
 def get_order_payments(order_id):
     order = Order.query.get_or_404(order_id)
     
-    # Check ownership or admin
     if order.user_id != request.current_user.id and request.current_user.role.name != 'admin':
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -133,7 +124,6 @@ def get_order_payments(order_id):
     
     return jsonify(payments_data), 200
 
-# POST - Simulate payment callback (for webhooks)
 @payment_bp.route('/callback/<provider>', methods=['POST'])
 def payment_callback(provider):
     data = request.get_json() or request.form.to_dict()

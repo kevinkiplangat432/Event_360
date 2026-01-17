@@ -1,44 +1,121 @@
-// src/pages/Home.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Calendar, 
-  Ticket, 
-  Users, 
-  Shield, 
-  Zap,
-  Globe,
+  MapPin,
   ChevronLeft,
   ChevronRight,
-  MapPin,
-  Clock,
-  Star,
-  TrendingUp
+  Sparkles
 } from 'lucide-react';
 import { eventsAPI } from '../utils/api';
 
 const Home = () => {
   const [featuredEvents, setFeaturedEvents] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
-    fetchFeaturedEvents();
+    fetchEvents();
   }, []);
 
-  const fetchFeaturedEvents = async () => {
+  const fetchEvents = async () => {
     try {
-      const response = await eventsAPI.getAll({
+      setLoading(true);
+      // Fetch featured events (approved and upcoming)
+      const featuredResponse = await eventsAPI.getAll({
         status: 'approved',
-        upcoming: 'true',
-        limit: 6
+        upcoming: true,
+        featured: true,
+        limit: 5
       });
-      setFeaturedEvents(response.data.slice(0, 3));
+      setFeaturedEvents(featuredResponse.data || []);
+
+      // Fetch more upcoming events
+      const upcomingResponse = await eventsAPI.getAll({
+        status: 'approved',
+        upcoming: true,
+        limit: 9
+      });
+      setUpcomingEvents(upcomingResponse.data || []);
     } catch (error) {
-      console.error('Error fetching featured events:', error);
+      console.error('Error fetching events:', error);
+      // Mock data for development
+      setFeaturedEvents(getMockFeaturedEvents());
+      setUpcomingEvents(getMockUpcomingEvents());
     } finally {
       setLoading(false);
     }
+  };
+
+  const getMockFeaturedEvents = () => {
+    return [
+      {
+        id: 1,
+        title: "Nairobi Tech Conference 2024",
+        description: "Annual technology conference featuring industry leaders, workshops, and networking opportunities.",
+        venue: "KICC",
+        city: "Nairobi",
+        start_time: "2024-12-15T09:00:00",
+        poster_url: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&auto=format&fit=crop",
+        category: "Conference"
+      },
+      {
+        id: 2,
+        title: "Mombasa Music Festival",
+        description: "Three days of live music, food, and entertainment on the beautiful Mombasa coast.",
+        venue: "Bamburi Beach",
+        city: "Mombasa",
+        start_time: "2024-11-20T16:00:00",
+        poster_url: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1200&auto=format&fit=crop",
+        category: "Music"
+      },
+      {
+        id: 3,
+        title: "Startup Business Workshop",
+        description: "Learn how to launch and grow your startup from successful entrepreneurs.",
+        venue: "Nairobi Garage",
+        city: "Nairobi",
+        start_time: "2024-12-05T10:00:00",
+        poster_url: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=1200&auto=format&fit=crop",
+        category: "Workshop"
+      }
+    ];
+  };
+
+  const getMockUpcomingEvents = () => {
+    return [
+      {
+        id: 4,
+        title: "Art Exhibition Opening",
+        description: "Contemporary African art exhibition featuring emerging artists.",
+        venue: "National Museum",
+        city: "Nairobi",
+        start_time: "2024-11-25T18:00:00",
+        poster_url: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&auto=format&fit=crop",
+        category: "Art"
+      },
+      {
+        id: 5,
+        title: "Charity Run Marathon",
+        description: "Annual marathon to raise funds for children's education.",
+        venue: "Uhuru Park",
+        city: "Nairobi",
+        start_time: "2024-12-10T06:00:00",
+        poster_url: "https://images.unsplash.com/photo-1552674605-db6ffd8facb5?w=800&auto=format&fit=crop",
+        category: "Sports"
+      },
+      {
+        id: 6,
+        title: "Food & Wine Tasting",
+        description: "Experience the finest Kenyan cuisine paired with selected wines.",
+        venue: "Sankara Hotel",
+        city: "Nairobi",
+        start_time: "2024-11-30T19:00:00",
+        poster_url: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&auto=format&fit=crop",
+        category: "Food"
+      }
+    ];
   };
 
   const nextSlide = () => {
@@ -49,57 +126,17 @@ const Home = () => {
     setCurrentSlide((prev) => (prev - 1 + featuredEvents.length) % featuredEvents.length);
   };
 
-  const features = [
-    {
-      icon: <Calendar className="h-8 w-8" />,
-      title: "Easy Event Creation",
-      description: "Create and manage events effortlessly with our intuitive tools"
-    },
-    {
-      icon: <Ticket className="h-8 w-8" />,
-      title: "Digital Ticketing",
-      description: "QR-based tickets with secure validation"
-    },
-    {
-      icon: <Users className="h-8 w-8" />,
-      title: "Community Focus",
-      description: "Connect with attendees and build relationships"
-    },
-    {
-      icon: <Shield className="h-8 w-8" />,
-      title: "Secure Platform",
-      description: "Bank-level security for all transactions"
-    },
-    {
-      icon: <Zap className="h-8 w-8" />,
-      title: "Fast Performance",
-      description: "Optimized for seamless user experience"
-    },
-    {
-      icon: <Globe className="h-8 w-8" />,
-      title: "Global Access",
-      description: "Manage events across different locations"
-    }
-  ];
-
-  const stats = [
-    { label: "Events Hosted", value: "850+", icon: <Calendar /> },
-    { label: "Happy Users", value: "8,420+", icon: <Users /> },
-    { label: "Tickets Sold", value: "32,150+", icon: <Ticket /> },
-    { label: "Cities", value: "28+", icon: <Globe /> }
-  ];
-
   return (
     <div className="min-h-screen">
       {/* Hero Slider Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-dark-900 to-dark-800">
         {loading ? (
-          <div className="h-[70vh] flex items-center justify-center">
+          <div className="h-[60vh] flex items-center justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
           </div>
         ) : featuredEvents.length > 0 ? (
           <>
-            <div className="relative h-[70vh]">
+            <div className="relative h-[60vh]">
               {featuredEvents.map((event, index) => (
                 <div
                   key={event.id}
@@ -109,7 +146,7 @@ const Home = () => {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 to-dark-900/50 z-10"></div>
                   <img
-                    src={event.poster_url || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920&auto=format&fit=crop'}
+                    src={event.poster_url}
                     alt={event.title}
                     className="w-full h-full object-cover"
                   />
@@ -117,12 +154,13 @@ const Home = () => {
                     <div className="container mx-auto px-4">
                       <div className="max-w-2xl">
                         <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary-500/20 text-primary-300 text-sm mb-6">
+                          <Sparkles className="h-4 w-4 mr-2" />
                           Featured Event
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+                        <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
                           {event.title}
                         </h1>
-                        <p className="text-xl text-gray-300 mb-8 line-clamp-2">
+                        <p className="text-lg text-gray-300 mb-8 line-clamp-2">
                           {event.description}
                         </p>
                         <div className="flex flex-wrap gap-4 mb-8">
@@ -132,18 +170,18 @@ const Home = () => {
                           </div>
                           <div className="flex items-center text-gray-300">
                             <Calendar className="h-5 w-5 mr-2" />
-                            {new Date(event.start_time).toLocaleDateString()}
-                          </div>
-                          <div className="flex items-center text-gray-300">
-                            <Clock className="h-5 w-5 mr-2" />
-                            {new Date(event.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(event.start_time).toLocaleDateString('en-US', {
+                              weekday: 'long',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
                           </div>
                         </div>
                         <Link
                           to={`/events/${event.id}`}
                           className="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors"
                         >
-                          View Details
+                          View Event Details
                           <ChevronRight className="ml-2 h-5 w-5" />
                         </Link>
                       </div>
@@ -158,6 +196,7 @@ const Home = () => {
               <button
                 onClick={prevSlide}
                 className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors"
+                aria-label="Previous slide"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
@@ -171,70 +210,48 @@ const Home = () => {
                         ? 'w-8 bg-primary-600' 
                         : 'w-2 bg-white/50 hover:bg-white/70'
                     }`}
+                    aria-label={`Go to slide ${index + 1}`}
                   />
                 ))}
               </div>
               <button
                 onClick={nextSlide}
                 className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors"
+                aria-label="Next slide"
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
             </div>
           </>
         ) : (
-          <div className="h-[70vh] flex items-center justify-center">
+          <div className="h-[60vh] flex items-center justify-center">
             <div className="text-center">
               <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-300">No featured events available</p>
+              <Link 
+                to="/create-event" 
+                className="mt-4 inline-block px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+              >
+                Create First Event
+              </Link>
             </div>
           </div>
         )}
       </section>
 
-      {/* Features Grid */}
-      <section className="py-16 bg-dark-50 dark:bg-dark-900">
+      {/* Upcoming Events Section */}
+      <section className="py-12 bg-white dark:bg-dark-800">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-dark-900 dark:text-white mb-4">
-              Everything You Need for Successful Events
-            </h2>
-            <p className="text-dark-600 dark:text-dark-400 max-w-2xl mx-auto">
-              From planning to execution, we provide complete tools for creating unforgettable experiences
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div key={index} className="card hover:border-primary-500/50 group">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 mb-4 group-hover:scale-110 transition-transform">
-                  {feature.icon}
-                </div>
-                <h3 className="text-lg font-semibold text-dark-900 dark:text-white mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-dark-600 dark:text-dark-400">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Upcoming Events */}
-      <section className="py-16 bg-white dark:bg-dark-800">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
-              <h2 className="text-3xl font-bold text-dark-900 dark:text-white">
+              <h2 className="text-2xl font-bold text-dark-900 dark:text-white">
                 Upcoming Events
               </h2>
               <p className="text-dark-600 dark:text-dark-400 mt-2">
                 Discover events happening near you
               </p>
             </div>
-            <Link to="/events" className="mt-4 md:mt-0 btn-primary">
+            <Link to="/events" className="mt-4 md:mt-0 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors">
               View All Events
             </Link>
           </div>
@@ -249,10 +266,49 @@ const Home = () => {
                 </div>
               ))}
             </div>
-          ) : featuredEvents.length > 0 ? (
+          ) : upcomingEvents.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
+              {upcomingEvents.map((event) => (
+                <Link
+                  key={event.id}
+                  to={`/events/${event.id}`}
+                  className="card group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                >
+                  <div className="relative overflow-hidden rounded-lg mb-4">
+                    <img
+                      src={event.poster_url}
+                      alt={event.title}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute top-3 left-3">
+                      <span className="px-2 py-1 bg-primary-600 text-white text-xs rounded">
+                        {event.category}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-lg font-semibold text-dark-900 dark:text-white mb-2 line-clamp-1">
+                    {event.title}
+                  </h3>
+                  
+                  <p className="text-dark-600 dark:text-dark-400 mb-4 line-clamp-2">
+                    {event.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between text-sm text-dark-500 dark:text-dark-400">
+                    <div className="flex items-center">
+                      <Calendar className="h-4 w-4 mr-1" />
+                      {new Date(event.start_time).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </div>
+                    <div className="flex items-center">
+                      <MapPin className="h-4 w-4 mr-1" />
+                      {event.city}
+                    </div>
+                  </div>
+                </Link>
               ))}
             </div>
           ) : (
@@ -261,111 +317,18 @@ const Home = () => {
               <p className="text-dark-600 dark:text-dark-400">
                 No upcoming events available
               </p>
+              <Link 
+                to="/create-event" 
+                className="mt-4 inline-block px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+              >
+                Create First Event
+              </Link>
             </div>
           )}
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 bg-primary-700">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">
-              Trusted by Thousands
-            </h2>
-            <p className="text-primary-100 max-w-2xl mx-auto">
-              Join event organizers and attendees who rely on our platform
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-white/10 text-white mb-4">
-                  {stat.icon}
-                </div>
-                <div className="text-3xl font-bold text-white mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-primary-100">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-dark-800">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold text-white mb-6">
-              Ready to Transform Your Event Experience?
-            </h2>
-            <p className="text-gray-300 mb-8">
-              Whether organizing or attending, EventHub delivers exceptional experiences
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link 
-                to="/register" 
-                className="bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors inline-flex items-center justify-center"
-              >
-                Get Started Free
-                <TrendingUp className="ml-2 h-5 w-5" />
-              </Link>
-              <Link 
-                to="/events" 
-                className="bg-transparent border-2 border-white text-white hover:bg-white/10 font-semibold py-3 px-8 rounded-lg transition-colors"
-              >
-                Explore Events
-              </Link>
-            </div>
-          </div>
         </div>
       </section>
     </div>
   );
 };
-
-// Event Card Component
-const EventCard = ({ event }) => (
-  <Link
-    to={`/events/${event.id}`}
-    className="card group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-  >
-    <div className="relative overflow-hidden rounded-lg mb-4">
-      <img
-        src={event.poster_url || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop'}
-        alt={event.title}
-        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-      />
-      <div className="absolute top-3 left-3">
-        <span className="badge badge-primary">
-          {event.category}
-        </span>
-      </div>
-    </div>
-    
-    <h3 className="text-lg font-semibold text-dark-900 dark:text-white mb-2 line-clamp-1">
-      {event.title}
-    </h3>
-    
-    <p className="text-dark-600 dark:text-dark-400 mb-4 line-clamp-2">
-      {event.description}
-    </p>
-    
-    <div className="flex items-center justify-between text-sm text-dark-500 dark:text-dark-400">
-      <div className="flex items-center">
-        <Calendar className="h-4 w-4 mr-1" />
-        {new Date(event.start_time).toLocaleDateString()}
-      </div>
-      <div className="flex items-center">
-        <MapPin className="h-4 w-4 mr-1" />
-        {event.city}
-      </div>
-    </div>
-  </Link>
-);
 
 export default Home;

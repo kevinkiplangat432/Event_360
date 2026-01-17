@@ -1,9 +1,8 @@
 services:
   - type: web
     name: event360-backend
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn server.run:app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -16,10 +15,9 @@ services:
       - key: FLASK_ENV
         value: production
       - key: CORS_ORIGINS
-        value: https://yourapp.vercel.app  # Update with your Vercel URL
+        value: https://yourapp.vercel.app
 
 databases:
   - name: event360-database
     databaseName: event360
-    user: postgres  # Render will handle this automatically
     plan: free
