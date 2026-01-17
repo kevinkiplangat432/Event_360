@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from .extensions import db, bcrypt, cors, migrate
 from .config import config
+from .models import Role
 import os
 
 def create_app(config_name='default'):
@@ -28,6 +29,22 @@ def create_app(config_name='default'):
          methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
     
     config[config_name].init_app(app)
+    
+    # Create default roles on app startup
+    with app.app_context():
+        try:
+            # Check if tables exist first
+            inspector = db.inspect(db.engine)
+            tables = inspector.get_table_names()
+            
+            if 'roles' in tables:
+                Role.create_default_roles()
+                print("Default roles ensured")
+            else:
+                print("Tables not found - run migrations first")
+        except Exception as e:
+            print(f"Warning: Could not create roles: {e}")
+    
     register_blueprints(app)
     register_error_handlers(app)
     

@@ -1,5 +1,4 @@
 import os
-from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -16,7 +15,8 @@ class Config:
             database_url = database_url.replace('postgres://', 'postgresql://', 1)
         SQLALCHEMY_DATABASE_URI = database_url
     else:
-        SQLALCHEMY_DATABASE_URI = 'postgresql://eventuser:eventdb@localhost:5432/eventdatabase'
+        # Use your local Postgres DB
+        SQLALCHEMY_DATABASE_URI = 'postgresql://event360_user:event360pass@localhost:5432/event360_db'
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
@@ -36,6 +36,11 @@ class Config:
     
     APP_NAME = 'Event360'
     DEBUG = os.environ.get('FLASK_ENV') == 'development'
+    
+    # Admin credentials (for first setup)
+    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@event360.com')
+    ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Event360Admin2024!')
     
     @staticmethod
     def init_app(app):

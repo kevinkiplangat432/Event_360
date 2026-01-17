@@ -1,22 +1,21 @@
 const uploadToCloudinary = async (file) => {
   try {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || 'event360_preset');
+    // For now, return a placeholder image to test event creation
+    console.log('Using placeholder image for testing');
+    const placeholderImages = [
+      'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&auto=format&fit=crop'
+    ];
     
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
-      {
-        method: 'POST',
-        body: formData
-      }
-    );
+    // Simulate upload delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    const data = await response.json();
-    return data.secure_url;
+    const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
+    return randomImage;
     
   } catch (error) {
-    console.error('Cloudinary upload error:', error);
+    console.error('Upload error:', error);
     return 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop';
   }
 };

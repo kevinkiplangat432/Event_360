@@ -16,6 +16,8 @@ import Register from './pages/Register';
 import CreateEvent from './pages/CreateEvent';
 import Admin from './pages/Admin';
 import AdminTools from './pages/AdminTools'; // NEW
+import AdminUsers from './pages/AdminUsers';
+import AdminAnalytics from './pages/AdminAnalytics';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
@@ -89,6 +91,26 @@ function App() {
                     element={
                       <ProtectedRoute requiredRoles={['admin']}>
                         <AdminTools />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  
+                  {/* Admin Users Route */}
+                  <Route 
+                    path="/admin/users" 
+                    element={
+                      <ProtectedRoute requiredRoles={['admin']}>
+                        <AdminUsers />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  
+                  {/* Admin Analytics Route */}
+                  <Route 
+                    path="/admin/analytics" 
+                    element={
+                      <ProtectedRoute requiredRoles={['admin']}>
+                        <AdminAnalytics />
                       </ProtectedRoute>
                     } 
                   />
