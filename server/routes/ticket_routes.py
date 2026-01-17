@@ -10,13 +10,11 @@ import base64
 
 ticket_bp = Blueprint('tickets', __name__, url_prefix='/api/tickets')
 
-# GET all tickets for current user
 @ticket_bp.route('', methods=['GET'])
 @token_required
 def get_user_tickets():
     user_id = request.current_user.id
     
-    # Get tickets through orders
     tickets = Ticket.query.join(Order).filter(Order.user_id == user_id).order_by(Ticket.created_at.desc()).all()
     
     tickets_data = []
@@ -45,7 +43,6 @@ def get_user_tickets():
     
     return jsonify(tickets_data), 200
 
-# GET ticket details by ID
 @ticket_bp.route('/<int:ticket_id>', methods=['GET'])
 @token_required
 def get_ticket(ticket_id):
@@ -148,7 +145,6 @@ def check_in_ticket(ticket_id):
         }
     }), 200
 
-# GET - Verify ticket by code (Public/Organizer)
 @ticket_bp.route('/verify/<code>', methods=['GET'])
 @token_required
 def verify_ticket(code):
@@ -157,7 +153,6 @@ def verify_ticket(code):
     if not ticket:
         return jsonify({'error': 'Invalid ticket code'}), 404
     
-    # Check if user has permission (organizer, admin, or ticket owner)
     is_organizer = ticket.order.event.organizer_id == request.current_user.id
     is_admin = request.current_user.role.name == 'admin'
     is_owner = ticket.order.user_id == request.current_user.id

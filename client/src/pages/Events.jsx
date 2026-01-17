@@ -24,7 +24,7 @@ const Events = () => {
     category: searchParams.get('category') || '',
     city: searchParams.get('city') || '',
     search: searchParams.get('search') || '',
-    status: searchParams.get('status') || 'approved'
+    status: searchParams.get('status') || 'all'  // Show all events by default for testing
   });
   const [showFilters, setShowFilters] = useState(false);
   const [page, setPage] = useState(1);
@@ -48,10 +48,14 @@ const Events = () => {
     setLoading(true);
     try {
       const params = {
-        status: filters.status,
         page,
         limit: 12
       };
+      
+      // Only add status filter if it's not 'all'
+      if (filters.status && filters.status !== 'all') {
+        params.status = filters.status;
+      }
       
       if (filters.category && filters.category !== 'All') {
         params.category = filters.category;
@@ -63,7 +67,6 @@ const Events = () => {
       const response = await eventsAPI.getAll(params);
       setEvents(response.data);
       
-      // In a real API, you'd get total pages from response
       setTotalPages(Math.ceil(response.data.length / 12));
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -91,7 +94,7 @@ const Events = () => {
       category: '',
       city: '',
       search: '',
-      status: 'approved'
+      status: 'all'  // Reset to show all events
     });
     setSearchParams({});
     setPage(1);

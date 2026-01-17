@@ -1,4 +1,3 @@
-# server/run.py
 import os
 from datetime import datetime
 from server import create_app

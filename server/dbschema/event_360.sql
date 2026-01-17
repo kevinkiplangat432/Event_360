@@ -1,116 +1,154 @@
--- CREATE TABLE "roles" (
---   "id" int PRIMARY KEY,
---   "name" varchar UNIQUE NOT NULL,
---   "created_at" timestamp
--- );
+Table roles {
+  id int [pk]
+  name varchar(50) [unique, not null]
+  created_at datetime
+}
 
--- CREATE TABLE "users" (
---   "id" int PRIMARY KEY,
---   "username" varchar UNIQUE NOT NULL,
---   "email" varchar UNIQUE NOT NULL,
---   "phone" varchar,
---   "password_hash" varchar NOT NULL,
---   "role_id" int NOT NULL,
---   "is_active" boolean DEFAULT true,
---   "created_at" timestamp
--- );
+Table users {
+  id int [pk]
+  username varchar(100) [unique, not null]
+  email varchar(120) [unique, not null]
+  phone varchar(20)
+  password_hash varchar(255) [not null]
+  role_id int [ref: > roles.id, default: 3, not null]
+  is_active boolean [default: true]
+  created_at datetime
+  avatar_url varchar(255)
+}
 
--- CREATE TABLE "events" (
---   "id" int PRIMARY KEY,
---   "organizer_id" int NOT NULL,
---   "title" varchar NOT NULL,
---   "description" text,
---   "venue" varchar,
---   "start_time" timestamp NOT NULL,
---   "end_time" timestamp NOT NULL,
---   "status" varchar NOT NULL,
---   "created_at" timestamp
---   "poster_url" varchar
--- );
+Table events {
+  id int [pk]
+  organizer_id int [ref: > users.id, not null]
+  title varchar(200) [not null]
+  description text
+  venue varchar(200)
+  address varchar(500)
+  city varchar(100)
+  country varchar(100)
+  start_time datetime [not null]
+  end_time datetime [not null]
+  category varchar(100)
+  status varchar(50) [default: 'pending']
+  created_at datetime
+  updated_at datetime
+  poster_url varchar(255)
+  banner_url varchar(255)
+  capacity int
+  is_public boolean [default: true]
+}
 
--- CREATE TABLE "event_approvals" (
---   "id" int PRIMARY KEY,
---   "event_id" int NOT NULL,
---   "admin_id" int NOT NULL,
---   "status" varchar NOT NULL,
---   "comment" text,
---   "decided_at" timestamp
--- );
+Table event_approvals {
+  id int [pk]
+  event_id int [ref: > events.id, not null]
+  admin_id int [ref: > users.id, not null]
+  status varchar(50) [not null]
+  comment text
+  decided_at datetime
+}
 
--- CREATE TABLE "ticket_types" (
---   "id" int PRIMARY KEY,
---   "event_id" int NOT NULL,
---   "name" varchar NOT NULL,
---   "price" numeric NOT NULL,
---   "quantity_total" int NOT NULL,
---   "quantity_sold" int DEFAULT 0,
---   "sale_start" timestamp,
---   "sale_end" timestamp,
---   "access_level" varchar DEFAULT 'general',
---   "is_active" boolean DEFAULT true
--- );
+Table ticket_types {
+  id int [pk]
+  event_id int [ref: > events.id, not null]
+  name varchar(100) [not null]
+  description text
+  price numeric(10,2) [not null]
+  quantity_total int [not null]
+  quantity_sold int [default: 0]
+  sale_start datetime
+  sale_end datetime
+  access_level varchar(50) [default: 'general']
+  is_active boolean [default: true]
+  max_per_user int [default: 10]
+}
 
--- CREATE TABLE "orders" (
---   "id" int PRIMARY KEY,
---   "user_id" int NOT NULL,
---   "event_id" int NOT NULL,
---   "total_amount" numeric NOT NULL,
---   "payment_status" varchar NOT NULL,
---   "created_at" timestamp
--- );
+Table orders {
+  id int [pk]
+  user_id int [ref: > users.id, not null]
+  event_id int [ref: > events.id, not null]
+  total_amount numeric(10,2) [not null]
+  payment_status varchar(50) [default: 'pending']
+  order_status varchar(50) [default: 'processing']
+  created_at datetime
+  updated_at datetime
+  reference varchar(100) [unique]
+}
 
--- CREATE TABLE "payments" (
---   "id" int PRIMARY KEY,
---   "order_id" int NOT NULL,
---   "provider" varchar,
---   "provider_ref" varchar,
---   "status" varchar,
---   "raw_payload" json,
---   "created_at" timestamp
--- );
+Table order_items {
+  id int [pk]
+  order_id int [ref: > orders.id, not null]
+  ticket_type_id int [ref: > ticket_types.id, not null]
+  quantity int [not null]
+  unit_price numeric(10,2) [not null]
+  subtotal numeric(10,2) [not null]
+}
 
--- CREATE TABLE "tickets" (
---   "id" int PRIMARY KEY,
---   "order_id" int NOT NULL,
---   "ticket_type_id" int NOT NULL,
---   "code" varchar UNIQUE NOT NULL,
---   "qr_image_url" varchar,
---   "status" varchar DEFAULT 'valid',
---   "checked_in_at" timestamp
--- );
+Table payments {
+  id int [pk]
+  order_id int [ref: > orders.id, not null]
+  provider varchar(50)
+  provider_ref varchar(100)
+  amount numeric(10,2)
+  status varchar(50) [default: 'pending']
+  raw_payload json
+  created_at datetime
+}
 
--- CREATE TABLE "event_registrations" (
---   "id" int PRIMARY KEY,
---   "user_id" int NOT NULL,
---   "event_id" int NOT NULL,
---   "quantity" int NOT NULL,
---   "registered_at" timestamp
--- );
+Table tickets {
+  id int [pk]
+  order_id int [ref: > orders.id, not null]
+  ticket_type_id int [ref: > ticket_types.id, not null]
+  code varchar(100) [unique, not null]
+  qr_image_url varchar(255)
+  status varchar(50) [default: 'valid']
+  checked_in_at datetime
+  created_at datetime
+}
 
--- CREATE INDEX ON "users" ("email");
+Table event_registrations {
+  id int [pk]
+  user_id int [ref: > users.id, not null]
+  event_id int [ref: > events.id, not null]
+  quantity int [not null]
+  registration_type varchar(50) [default: 'general']
+  notes text
+  registered_at datetime
+  updated_at datetime
 
--- CREATE INDEX ON "users" ("username");
+  Indexes {
+    (user_id, event_id) [unique]
+  }
+}
 
--- ALTER TABLE "users" ADD FOREIGN KEY ("role_id") REFERENCES "roles" ("id");
+Table reviews {
+  id int [pk]
+  user_id int [ref: > users.id, not null]
+  event_id int [ref: > events.id, not null]
+  rating int [not null]
+  comment text
+  created_at datetime
 
--- ALTER TABLE "events" ADD FOREIGN KEY ("organizer_id") REFERENCES "users" ("id");
+  Indexes {
+    (user_id, event_id) [unique]
+  }
+}
 
--- ALTER TABLE "event_approvals" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id");
+Table wishlists {
+  id int [pk]
+  user_id int [ref: > users.id, not null]
+  event_id int [ref: > events.id, not null]
+  created_at datetime
 
--- ALTER TABLE "event_approvals" ADD FOREIGN KEY ("admin_id") REFERENCES "users" ("id");
+  Indexes {
+    (user_id, event_id) [unique]
+  }
+}
 
--- ALTER TABLE "ticket_types" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id");
-
--- ALTER TABLE "orders" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
-
--- ALTER TABLE "orders" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id");
-
--- ALTER TABLE "payments" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
-
--- ALTER TABLE "tickets" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
-
--- ALTER TABLE "tickets" ADD FOREIGN KEY ("ticket_type_id") REFERENCES "ticket_types" ("id");
-
--- ALTER TABLE "event_registrations" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
-
--- ALTER TABLE "event_registrations" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id");
+Table notifications {
+  id int [pk]
+  user_id int [ref: > users.id, not null]
+  title varchar(200) [not null]
+  message text
+  type varchar(50)
+  is_read boolean [default: false]
+  created_at datetime
+}

@@ -2,24 +2,14 @@
 Event360 is a full-stack web application designed to manage events, ticketing, and user interactions in a modern, scalable way.
 The project follows a client–server architecture, with a React frontend and a Python (Flask) backend.
 
-# 🧩 Project Architecture
-Event360/
-│
-├── client/        # Frontend (React)
-│   ├── src/
-│   └── package.json
-│
-├── server/        # Backend (Flask)
-│   ├── app/
-│   ├── models.py
-│   ├── routes/
-│   └── seed.py
-│
-└── README.md
 
-#  🛠 Tech Stack
+### live at https://event-360.vercel.app/
 
-# Frontend (Client)
+
+
+### Tech Stack
+
+#### Frontend (Client)
 
 React (Vite)
 
@@ -29,7 +19,7 @@ CSS / Tailwind (if applicable)
 
 REST API consumption
 
-# Backend (Server)
+#### Backend (Server)
 
 Python
 
@@ -43,7 +33,7 @@ JWT Authentication
 
 SQLite / PostgreSQL (configurable)
 
-# ✨ Key Features
+#### Key Features
 
 User authentication & authorization
 
@@ -57,8 +47,8 @@ Responsive and modern UI
 
 Role-based access control
 
-# 🧑‍💻 Contributors & Roles
-# Backend (Server)
+### Contributors & Roles
+##### Backend (Server)
 
 Kevin Kiplangat
 
@@ -66,7 +56,7 @@ Festus Kisoi
 
 Responsible for API design, database modeling, authentication, and business logic.
 
-# Frontend (Client)
+##### Frontend (Client)
 
 Sylvia Malala
 
@@ -74,11 +64,8 @@ Wise Munene
 
 Responsible for UI/UX implementation, routing, state handling, and API integration.
 
-# ⚙️ Setup & Installation
-# 🔧 Backend Setup (Flask)
-
-  # From the project root:
-
+# Setup & Installation
+# Backend Setup
 cd server
 python3 -m venv venv
 source venv/bin/activate
@@ -122,7 +109,7 @@ npm run dev
 
 http://localhost:5173
 
-# 🔐 Environment Variables
+#  Environment Variables
 
 # Create a .env file inside server/:
 
@@ -137,7 +124,7 @@ JWT_SECRET_KEY=your-jwt-secret-key
 VITE_API_BASE_URL=http://127.0.0.1:5000
 
 
-# 📌 Collaboration Workflow
+# Collaboration Workflow
 
 Feature-based branching
 
@@ -147,6 +134,26 @@ Clear commit messages
 
 Shared API contract between client & server
 
-# 📄 License
+# License
 
-This project is licensed under the MIT License.
+MIT License
+
+Copyright (c) 
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

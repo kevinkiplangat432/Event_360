@@ -1,4 +1,3 @@
-# server/utils/cloudinary_upload.py
 import cloudinary
 import cloudinary.uploader
 import os

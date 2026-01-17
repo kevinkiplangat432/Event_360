@@ -6,7 +6,7 @@ from datetime import datetime
 
 def seed_database():
     """Seed the database with initial data"""
-    print("🌱 Seeding database...")
+    print("Seeding database...")
     
     # Create roles
     roles = ['admin', 'organizer', 'attendee']
