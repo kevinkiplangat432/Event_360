@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { uploadToCloudinary } from '../utils/imageUpload';
+import { eventsAPI } from '../utils/api';
 
 const CreateEvent = () => {
   const navigate = useNavigate();
@@ -151,18 +152,29 @@ const CreateEvent = () => {
     try {
       // Combine date and time
       const startDateTime = new Date(`${formData.startDate}T${formData.startTime}`);
-      const endDateTime = formData.endDate ? new Date(`${formData.endDate}T${formData.endTime}`) : null;
+      const endDateTime = formData.endDate && formData.endTime 
+        ? new Date(`${formData.endDate}T${formData.endTime}`) 
+        : new Date(startDateTime.getTime() + 2 * 60 * 60 * 1000); // Default to 2 hours later
 
       const eventData = {
-        ...formData,
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        venue: formData.venue,
+        address: formData.address,
+        city: formData.city,
+        country: formData.country,
         start_time: startDateTime.toISOString(),
-        end_time: endDateTime ? endDateTime.toISOString() : null,
+        end_time: endDateTime.toISOString(),
         capacity: formData.capacity ? parseInt(formData.capacity) : null,
-        price: formData.price ? parseFloat(formData.price) : 0
+        poster_url: formData.poster_url,
+        is_public: formData.isPublic
       };
 
-      // Mock API call - replace with actual API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Sending event data:', eventData);
+
+      // Create event via API
+      const response = await eventsAPI.create(eventData);
       
       setSuccess('Event created successfully! It will be reviewed by admin before going live.');
       
@@ -191,7 +203,9 @@ const CreateEvent = () => {
         navigate('/events');
       }, 2000);
     } catch (err) {
-      setError('Failed to create event. Please try again.');
+      console.error('Event creation error:', err);
+      console.error('Error response:', err.response?.data);
+      setError(err.response?.data?.error || 'Failed to create event. Please try again.');
     } finally {
       setLoading(false);
     }
