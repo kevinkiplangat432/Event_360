@@ -70,32 +70,59 @@ cd server
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+
+
+   # Go back to project root:
+
+cd ..
+export FLASK_ENV=development
+export FLASK_APP=server:create_app
 flask db upgrade
-python seed.py
-python app/app.py
 
 
-# Server runs on:
+   # (Optional – first time only)
+
+flask db migrate -m "initial migration"
+
+
+# Seed the database:
+
+python server/seed/seed_data.py
+
+
+# Run the backend server:
+
+flask run
+
+
+# 📍 Server runs on:
 
 http://127.0.0.1:5000
 
-# Frontend Setup
+# 🎨 Frontend Setup (React)
 cd client
 npm install
 npm run dev
 
 
-# Client runs on:
+# 📍 Client runs on:
 
 http://localhost:5173
 
 #  Environment Variables
 
-Create a .env file in both client and server as needed:
+# Create a .env file inside server/:
 
-DATABASE_URL=
-SECRET_KEY=
-JWT_SECRET_KEY=
+FLASK_ENV=development
+DATABASE_URL=postgresql://eventuser:eventdb@localhost:5432/eventdatabase
+SECRET_KEY=your-secret-key
+JWT_SECRET_KEY=your-jwt-secret-key
+
+
+# (Optional for frontend)
+
+VITE_API_BASE_URL=http://127.0.0.1:5000
+
 
 # Collaboration Workflow
 
