@@ -187,6 +187,9 @@ def update_user_role(user_id):
     if not role_name:
         return jsonify({'error': 'Role is required'}), 400
     
+    # Convert to lowercase to match database
+    role_name = role_name.lower()
+    
     role = Role.query.filter_by(name=role_name).first()
     if not role:
         return jsonify({'error': 'Invalid role'}), 400
