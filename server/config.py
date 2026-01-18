@@ -16,7 +16,7 @@ class Config:
         SQLALCHEMY_DATABASE_URI = database_url
     else:
         # Use your local Postgres DB
-        SQLALCHEMY_DATABASE_URI = 'postgresql://event360_user:event360pass@localhost:5432/event360_db'
+        SQLALCHEMY_DATABASE_URI = 'postgresql://event360_user:postgres@localhost:5432/event360_db'
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
