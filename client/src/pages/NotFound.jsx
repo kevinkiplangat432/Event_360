@@ -14,10 +14,10 @@ const NotFound = () => {
             404
           </h1>
           <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4">
-            Page Not Found
+            Page Not Found under development
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-8">
-            The page you are looking for doesn't exist or has been moved.
+            The page you are looking for doesn't exist but it is being developed kindly be patient with us.
           </p>
         </div>
 

@@ -11,7 +11,6 @@ def create_app(config_name='default'):
     if os.environ.get('RENDER') or os.environ.get('FLASK_ENV') == 'production':
         config_name = 'production'
     
-    print(f"=== CREATING APP WITH CONFIG: {config_name} ===")
     
     app = Flask(__name__)
     app.config.from_object(config[config_name])

@@ -1,4 +1,3 @@
-# server/routes/order_routes.py
 from flask import Blueprint, request, jsonify
 from server.extensions import db
 from server.models import Order, OrderItem, TicketType, Ticket, EventRegistration, Payment

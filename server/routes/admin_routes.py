@@ -1,4 +1,3 @@
-# server/routes/admin_routes.py
 from flask import Blueprint, request, jsonify
 from server.extensions import db
 from server.models import Event, EventApproval, User, Role, Notification, Order
@@ -56,10 +55,9 @@ def create_first_admin():
 def seed_database():
     """Seed database with sample data"""
     try:
-        # Create categories if they don't exist
         categories = ['Technology', 'Music', 'Art', 'Sports', 'Food', 'Business', 'Education', 'Workshop', 'Conference', 'Networking']
         
-        # Create sample events
+        # Create sample events @kevin this is only for testing purposes
         sample_events = [
             {
                 'title': 'Tech Conference Nairobi 2024',

@@ -2,9 +2,8 @@ import { uploadToCloudinary as apiUpload } from './api';
 
 const uploadToCloudinary = async (file) => {
   try {
-    console.log('Uploading image to Cloudinary...');
     const imageUrl = await apiUpload(file);
-    console.log('Image uploaded successfully:', imageUrl);
+    console.log('Image uploaded :', imageUrl);
     return imageUrl;
   } catch (error) {
     console.error('Upload error:', error);

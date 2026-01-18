@@ -10,7 +10,6 @@ class Config:
     database_url = os.environ.get('DATABASE_URL')
     
     if database_url:
-        # Fix for Render's postgres:// URLs
         if database_url.startswith('postgres://'):
             database_url = database_url.replace('postgres://', 'postgresql://', 1)
         SQLALCHEMY_DATABASE_URI = database_url
