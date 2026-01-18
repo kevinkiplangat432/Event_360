@@ -8,6 +8,7 @@ const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (isAdmin()) {
@@ -28,23 +29,57 @@ const AdminUsers = () => {
 
   const updateUserRole = async (userId, newRole) => {
     try {
+      // Clear any previous messages
+      setError('');
+      setMessage('');
+      
+      // Optimistically update the UI first
+      setUsers(prevUsers => 
+        prevUsers.map(user => 
+          user.id === userId ? { ...user, role: newRole } : user
+        )
+      );
+      
       await adminAPI.updateUserRole(userId, { role: newRole });
-      setMessage(`User role updated to ${newRole}`);
+      setMessage(`User role updated to ${newRole.charAt(0).toUpperCase() + newRole.slice(1)}`);
+      
+      // Refetch to ensure data consistency
       fetchUsers();
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       console.error('Error updating role:', error);
+      setError('Error updating user role. Please try again.');
+      // Revert the optimistic update on error
+      fetchUsers();
+      setTimeout(() => setError(''), 3000);
     }
   };
 
   const toggleUserStatus = async (userId, status) => {
     try {
+      // Clear any previous messages
+      setError('');
+      setMessage('');
+      
+      // Optimistically update the UI first
+      setUsers(prevUsers => 
+        prevUsers.map(user => 
+          user.id === userId ? { ...user, is_active: status } : user
+        )
+      );
+      
       await adminAPI.toggleUserStatus(userId, { status });
       setMessage(`User ${status ? 'activated' : 'deactivated'}`);
+      
+      // Refetch to ensure data consistency
       fetchUsers();
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       console.error('Error updating status:', error);
+      setError('Error updating user status. Please try again.');
+      // Revert the optimistic update on error
+      fetchUsers();
+      setTimeout(() => setError(''), 3000);
     }
   };
 
@@ -83,6 +118,13 @@ const AdminUsers = () => {
           </div>
         )}
 
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <AlertCircle className="h-5 w-5 text-red-500 mr-3 inline" />
+            {error}
+          </div>
+        )}
+
         {loading ? (
           <div className="text-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
@@ -115,7 +157,7 @@ const AdminUsers = () => {
                         <select
                           value={user.role || 'attendee'}
                           onChange={(e) => updateUserRole(user.id, e.target.value)}
-                          className="text-sm border rounded px-2 py-1"
+                          className="text-sm border rounded px-2 py-1 bg-white dark:bg-dark-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                         >
                           <option value="attendee">Attendee</option>
                           <option value="organizer">Organizer</option>

@@ -10,13 +10,12 @@ class Config:
     database_url = os.environ.get('DATABASE_URL')
     
     if database_url:
-        # Fix for Render's postgres:// URLs
         if database_url.startswith('postgres://'):
             database_url = database_url.replace('postgres://', 'postgresql://', 1)
         SQLALCHEMY_DATABASE_URI = database_url
     else:
-        # Use your local Postgres DB
-        SQLALCHEMY_DATABASE_URI = 'postgresql://event360_user:postgres@localhost:5432/event360_db'
+        # Use production database
+        SQLALCHEMY_DATABASE_URI = 'postgresql://event360_database_1jlv_user:02iMyAYGOW4LA9iETja4DGzWpmrHr6Y1@dpg-d5m89u4mrvns73ev8r9g-a/event360_database_1jlv'
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
@@ -28,7 +27,7 @@ class Config:
     
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'event360-jwt-secret-2024')
     
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://event-360.vercel.app,http://localhost:3000').split(',')
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://event-360.vercel.app,http://localhost:3000,http://localhost:5173').split(',')
     
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
@@ -65,7 +64,7 @@ class ProductionConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://event360_user:postgres@localhost:5432/event360_test'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://event360_database_1jlv_user:02iMyAYGOW4LA9iETja4DGzWpmrHr6Y1@dpg-d5m89u4mrvns73ev8r9g-a/event360_database_1jlv'
 
 # Configuration dictionary
 config = {

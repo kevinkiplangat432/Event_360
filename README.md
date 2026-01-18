@@ -1,132 +1,288 @@
-# EVENT360
-Event360 is a full-stack web application designed to manage events, ticketing, and user interactions in a modern, scalable way.
-The project follows a client–server architecture, with a React frontend and a Python (Flask) backend.
+# EVENT360 
 
+Event360 is a comprehensive full-stack event management platform that revolutionizes how events are created, managed, and experienced. Built with modern web technologies, it provides a seamless experience for event organizers, attendees, and administrators.
 
-### live at https://event-360.vercel.app/
+##### admin login
+- Email: admin@eventhub.com
+- Password: admin123!
 
+## Live Application
+**Frontend**: https://event-360.vercel.app/  
+**Backend API**: https://event-360-qm8m.onrender.com
 
+## Table of Contents
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Installation](#installation)
+- [API Documentation](#api-documentation)
+- [User Roles](#user-roles)
+- [Contributing](#contributing)
+- [License](#license)
 
-### Tech Stack
+## Features
 
-#### Frontend (Client)
+### Core Features
+- **Event Management**: Create, edit, and manage events with rich details
+- **User Authentication**: Secure JWT-based authentication system
+- **Role-Based Access**: Admin, Organizer, and Attendee roles with specific permissions
+- **Event Discovery**: Advanced search and filtering capabilities
+- **Image Upload**: Cloudinary integration for event posters and banners
+- **Real-time Updates**: Dynamic event status and user management
+- **Responsive Design**: Mobile-first, modern UI with dark/light themes
 
-React (Vite)
+### User Features
+- **Event Browsing**: Discover events with advanced search and filters
+- **Event Slideshow**: Featured events carousel on homepage
+- **User Profiles**: Customizable user profiles with avatar support
+- **Wishlist**: Save favorite events for later
+- **Event Reviews**: Rate and review attended events
+- **Notifications**: Real-time updates on event status and activities
 
-React Router
+###  Admin Features
+- **User Management**: View, edit user roles and status
+- **Event Approval**: Review and approve/reject pending events
+- **Analytics Dashboard**: Comprehensive statistics and insights
+- **Order Management**: View and manage all platform orders
+- **System Monitoring**: Track platform usage and performance
 
-CSS / Tailwind (if applicable)
+###  Organizer Features
+- **Event Creation**: Rich event creation with multiple ticket types
+- **Event Analytics**: Track registrations and engagement
+- **Attendee Management**: View and manage event registrations
+- **Event Updates**: Real-time event information updates
 
-REST API consumption
+##  Tech Stack
 
-#### Backend (Server)
+### Frontend
+- **Framework**: React 18 with Vite
+- **Routing**: React Router v6
+- **Styling**: Tailwind CSS with custom components
+- **State Management**: React Context API
+- **HTTP Client**: Axios with interceptors
+- **Icons**: Lucide React
+- **Build Tool**: Vite for fast development and building
 
-Python
+### Backend
+- **Framework**: Flask (Python)
+- **Database**: PostgreSQL with SQLAlchemy ORM
+- **Authentication**: JWT (JSON Web Tokens)
+- **File Upload**: Cloudinary integration
+- **Migrations**: Flask-Migrate
+- **CORS**: Flask-CORS for cross-origin requests
+- **Password Hashing**: Flask-Bcrypt
+- **Production Server**: Gunicorn
 
-Flask
+### Infrastructure
+- **Frontend Hosting**: Vercel
+- **Backend Hosting**: Render
+- **Database**: Render PostgreSQL
+- **File Storage**: Cloudinary
+- **Version Control**: Git/GitHub
 
-SQLAlchemy
+## Architecture
 
-Flask-Migrate
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   React Client  │────│   Flask API     │────│   PostgreSQL    │
+│   (Vercel)      │    │   (Render)      │    │   (Render)      │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+                    ┌─────────────────┐
+                    │   Cloudinary    │
+                    │  (File Storage) │
+                    └─────────────────┘
+```
 
-JWT Authentication
+## Installation
 
-SQLite / PostgreSQL (configurable)
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- PostgreSQL
+- Git
 
-#### Key Features
+### Backend Setup
 
-User authentication & authorization
+1. **Clone the repository**
+```bash
+git clone https://github.com/kevinkiplangat432/Event_360.git
+cd Event_360
+```
 
-Event creation and management
-
-Ticket types and registrations
-
-Secure API endpoints
-
-Responsive and modern UI
-
-Role-based access control
-
-### Contributors & Roles
-##### Backend (Server)
-
-Kevin Kiplangat
-
-Festus Kisoi
-
-Responsible for API design, database modeling, authentication, and business logic.
-
-##### Frontend (Client)
-
-Sylvia Malala
-
-Wise Munene
-
-Responsible for UI/UX implementation, routing, state handling, and API integration.
-
-# Setup & Installation
-# Backend Setup
-cd server
+2. **Create virtual environment**
+```bash
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. **Install dependencies**
+```bash
+cd server
 pip install -r requirements.txt
+```
+
+4. **Environment Configuration**
+Create `.env` file in project root:
+```env
+FLASK_ENV=development
+FLASK_APP=server:create_app
+DATABASE_URL=postgresql://username:password@localhost:5432/event360_db
+SECRET_KEY=your-secret-key-here
+JWT_SECRET_KEY=your-jwt-secret-here
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+```
+
+5. **Database Setup**
+```bash
+cd ..
+export FLASK_APP=server:create_app
 flask db upgrade
-python seed.py
-python app/app.py
+python server/seed/seed_data.py  # Optional: seed with sample data
+```
 
+6. **Run Backend Server**
+```bash
+flask run
+# Server runs on http://127.0.0.1:5000
+```
 
-# Server runs on:
+### Frontend Setup
 
-http://127.0.0.1:5000
-
-# Frontend Setup
+1. **Install dependencies**
+```bash
 cd client
 npm install
+```
+
+2. **Environment Configuration** (Optional)
+Create `.env` file in client directory:
+```env
+VITE_API_BASE_URL=http://127.0.0.1:5000
+```
+
+3. **Run Development Server**
+```bash
 npm run dev
+# Client runs on http://localhost:5173
+```
 
+## API Documentation
 
-# Client runs on:
+### Authentication Endpoints
+```
+POST /api/auth/register    # User registration
+POST /api/auth/login       # User login
+GET  /api/auth/me          # Get current user
+POST /api/auth/logout      # User logout
+```
 
-http://localhost:5173
+### Event Endpoints
+```
+GET    /api/events              # Get all events (with filters)
+GET    /api/events/{id}         # Get event by ID
+POST   /api/events              # Create new event
+PUT    /api/events/{id}         # Update event
+DELETE /api/events/{id}         # Delete event
+POST   /api/events/{id}/reviews # Create event review
+```
 
-#  Environment Variables
+### Admin Endpoints
+```
+GET /api/users                    # Get all users
+PUT /api/admin/users/{id}/role    # Update user role
+PUT /api/admin/users/{id}/status  # Toggle user status
+GET /api/admin/statistics         # Get platform analytics
+GET /api/admin/orders             # Get all orders
+```
 
-Create a .env file in both client and server as needed:
+### File Upload
+```
+POST /api/upload    # Upload image to Cloudinary
+```
 
-DATABASE_URL=
-SECRET_KEY=
-JWT_SECRET_KEY=
+## User Roles
 
-# Collaboration Workflow
+### Admin
+- Full platform access
+- User management (roles, status)
+- Event approval/rejection
+- Platform analytics
+- Order management
 
-Feature-based branching
+**Default Admin Credentials:**
+- Email: `admin@eventhub.com`
+- Password: `admin123!`
 
-Pull requests with reviews
+### Organizer
+- Create and manage events
+- View event analytics
+- Manage attendee registrations
+- Upload event media
 
-Clear commit messages
+### Attendee
+- Browse and search events
+- Register for events
+- Leave reviews and ratings
+- Manage personal wishlist
 
-Shared API contract between client & server
+## Contributing
 
-# License
+### Team Members
 
-MIT License
+**Backend Development:**
+- **Kevin Kiplangat** - Lead Backend Developer
+- **Festus Kisoi** - Backend Developer
 
-Copyright (c) 
+*Responsibilities: API design, database architecture, authentication, business logic*
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+**Frontend Development:**
+- **Sylvia Malala** - Lead Frontend Developer  
+- **Wise Munene** - Frontend Developer
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+*Responsibilities: UI/UX implementation, state management, API integration*
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+### Development Workflow
+1. **Feature Branches**: Create feature-specific branches
+2. **Pull Requests**: All changes via reviewed PRs
+3. **Code Standards**: Follow established coding conventions
+4. **Testing**: Ensure all features are tested
+5. **Documentation**: Update docs for new features
+
+### Getting Started
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
+
+## Deployment
+
+### Production Environment
+- **Frontend**: Deployed on Vercel with automatic deployments
+- **Backend**: Deployed on Render with Docker containerization
+- **Database**: Render PostgreSQL with automated backups
+- **CDN**: Cloudinary for optimized image delivery
+
+### Environment Variables (Production)
+```env
+FLASK_ENV=production
+DATABASE_URL=postgresql://user:pass@host:port/db
+CORS_ORIGINS=https://event-360.vercel.app
+# ... other production configs
+```
+
+##  License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+Copyright (c) 2024 Event360 Team
+
+---
+
+**Built with ❤️ by the Event360 Team**

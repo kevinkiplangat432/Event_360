@@ -42,7 +42,7 @@ const Events = () => {
 
   useEffect(() => {
     fetchEvents();
-  }, [searchParams, page]);
+  }, [searchParams, page, filters.search]);
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -62,6 +62,9 @@ const Events = () => {
       }
       if (filters.city && filters.city !== 'All Cities') {
         params.city = filters.city;
+      }
+      if (filters.search && filters.search.trim()) {
+        params.search = filters.search.trim();
       }
 
       const response = await eventsAPI.getAll(params);
