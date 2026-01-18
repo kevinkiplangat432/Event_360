@@ -7,7 +7,6 @@ from .registration_routes import registration_bp
 from .ticket_routes import ticket_bp
 from .admin_routes import admin_bp
 
-# Export all blueprints
 all_blueprints = [
     auth_bp,
     user_bp,

@@ -60,6 +60,7 @@ class User(db.Model):
             'email': self.email,
             'phone': self.phone,
             'role_id': self.role_id,
+            'role': self.role.name if self.role else None,
             'is_active': self.is_active,
             'created_at': self.created_at.isoformat()
         }
