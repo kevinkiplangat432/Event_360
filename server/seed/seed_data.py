@@ -20,7 +20,7 @@ def seed_database():
     db.session.commit()
     
     # Create admin user if not exists
-    admin_email = 'admin@event360.com'
+    admin_email = 'admin@eventhub.com'
     admin_user = User.query.filter_by(email=admin_email).first()
     if not admin_user:
         admin_role = Role.query.filter_by(name='admin').first()
@@ -32,7 +32,7 @@ def seed_database():
             is_active=True,
             created_at=datetime.utcnow()
         )
-        admin_user.set_password('Admin123!')
+        admin_user.set_password('admin123!')
         db.session.add(admin_user)
         print(f"   Created admin user: {admin_email}")
     

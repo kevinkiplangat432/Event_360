@@ -15,8 +15,8 @@ class Config:
             database_url = database_url.replace('postgres://', 'postgresql://', 1)
         SQLALCHEMY_DATABASE_URI = database_url
     else:
-        # Use your local Postgres DB
-        SQLALCHEMY_DATABASE_URI = 'postgresql://event360_user:event360pass@localhost:5432/event360_db'
+        # Use production database
+        SQLALCHEMY_DATABASE_URI = 'postgresql://event360_database_1jlv_user:02iMyAYGOW4LA9iETja4DGzWpmrHr6Y1@dpg-d5m89u4mrvns73ev8r9g-a/event360_database_1jlv'
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
@@ -65,7 +65,7 @@ class ProductionConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://event360_user:postgres@localhost:5432/event360_test'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://event360_database_1jlv_user:02iMyAYGOW4LA9iETja4DGzWpmrHr6Y1@dpg-d5m89u4mrvns73ev8r9g-a/event360_database_1jlv'
 
 # Configuration dictionary
 config = {
