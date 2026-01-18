@@ -12,4 +12,5 @@ python-dateutil==2.8.2
 pytest==7.4.3
 pytest-flask==1.2.0
 requests==2.31.0
-
+cloudinary==1.36.0
+gunicorn==21.2.0

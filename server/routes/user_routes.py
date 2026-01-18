@@ -1,4 +1,3 @@
-# server/routes/user_routes.py
 from flask import Blueprint, request, jsonify
 from server.extensions import db
 from server.models import User, Role, Notification, Event, Order, Review, Wishlist

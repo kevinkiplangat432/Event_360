@@ -92,6 +92,7 @@ def get_all_events():
     category = request.args.get('category')
     status = request.args.get('status', 'approved')  # Default to approved events
     city = request.args.get('city')
+    search = request.args.get('search')
     upcoming = request.args.get('upcoming', 'true').lower() == 'true'
     
     # Build query
@@ -105,6 +106,17 @@ def get_all_events():
     
     if city:
         query = query.filter_by(city=city)
+    
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            db.or_(
+                Event.title.ilike(search_term),
+                Event.description.ilike(search_term),
+                Event.venue.ilike(search_term),
+                Event.category.ilike(search_term)
+            )
+        )
     
     if upcoming:
         query = query.filter(Event.start_time > datetime.now(timezone.utc))

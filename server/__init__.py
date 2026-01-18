@@ -11,7 +11,6 @@ def create_app(config_name='default'):
     if os.environ.get('RENDER') or os.environ.get('FLASK_ENV') == 'production':
         config_name = 'production'
     
-    print(f"=== CREATING APP WITH CONFIG: {config_name} ===")
     
     app = Flask(__name__)
     app.config.from_object(config[config_name])
@@ -59,6 +58,7 @@ def register_blueprints(app):
     from .routes.registration_routes import registration_bp
     from .routes.ticket_routes import ticket_bp
     from .routes.admin_routes import admin_bp
+    from .routes.upload_routes import upload_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(user_bp)
@@ -68,6 +68,7 @@ def register_blueprints(app):
     app.register_blueprint(registration_bp)
     app.register_blueprint(ticket_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(upload_bp)
 
 def register_error_handlers(app):
     @app.errorhandler(404)

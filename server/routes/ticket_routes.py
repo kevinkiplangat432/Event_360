@@ -1,4 +1,3 @@
-# server/routes/ticket_routes.py
 from flask import Blueprint, request, jsonify
 from server.extensions import db
 from server.models import Ticket, Event, Order, User
