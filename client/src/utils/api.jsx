@@ -121,20 +121,18 @@ export const uploadToCloudinary = async (file) => {
   try {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', 'event360_preset');
     
-    // Fallback to Unsplash if Cloudinary fails
-    const fallbackImages = [
-      'https://images.unsplash.com/photo-1540575467063-178a50c2df87',
-      'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3',
-      'https://images.unsplash.com/photo-1559136555-9303baea8ebd'
-    ];
+    const response = await api.post('/api/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     
-    const randomImage = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
-    return `${randomImage}?w=800&auto=format&fit=crop`;
+    return response.data.url;
     
   } catch (error) {
-    console.error('Upload failed, using fallback:', error);
+    console.error('Upload failed:', error);
+    // Fallback to placeholder image
     return 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop';
   }
 };
