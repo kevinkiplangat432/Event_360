@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_URL = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('event-360')
-  ? 'https://event-360-xg6h.onrender.com'
+  ? 'https://event-360-qm8m.onrender.com'
   : 'http://localhost:5555';
 
 

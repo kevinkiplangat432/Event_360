@@ -28,7 +28,7 @@ class Config:
     
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'event360-jwt-secret-2024')
     
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://event-360.vercel.app,http://localhost:3000').split(',')
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://event-360.vercel.app,http://localhost:3000,http://localhost:5173').split(',')
     
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
