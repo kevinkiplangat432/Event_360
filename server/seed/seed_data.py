@@ -1,4 +1,12 @@
 # server/seed/seed_data.py
+import sys
+import os
+
+# Add project root to sys.path so 'server' module can be imported
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 from server.extensions import db
 from server.models import Role, User
 from werkzeug.security import generate_password_hash
